@@ -3,18 +3,18 @@
 
 <div class="page">
     <main>
-        <div class="top-row row">
+        <div class="top-row row align-items-center">
             <div class="col-auto">
             <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
                 <i class="bi bi-list"></i>&nbsp;Apps
             </button>
             </div>
-            <div class="col-auto ms-auto">
-              <h3><SectionOutlet SectionName="page-title" /></h3>
+            <div class="col-auto">
+              <h5 style="color:#333333;margin-block-end:0"><SectionOutlet SectionName="page-title" /></h5>
             </div>
         </div>
         <NavMenu />
-        <article class="content px-4">
+        <article class="container pt-5">
             @Body
         </article>
     </main>

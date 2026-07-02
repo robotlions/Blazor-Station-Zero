@@ -1,0 +1,193 @@
+﻿<h3>DraggableDesktop</h3>
+
+@code {
+
+}
+@page "/draggable-desktop"
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>Draggable Desktop</PageTitle>
+<SectionContent SectionName="page-title">Draggable Desktop</SectionContent>
+
+<style>
+	.desktop-area {
+		min-height: 320px;
+		padding: 24px;
+		background: linear-gradient(180deg,#7fb7ff,#cfeaff);
+	}
+
+	.folder {
+		width: 96px;
+		height: 72px;
+		background: linear-gradient(#ffd86b,#f0b02b);
+		border: 3px solid #000;
+		box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		user-select: none;
+		cursor: grab;
+	}
+
+		.folder.dragging {
+			opacity: 0.6;
+		}
+
+	.hotspots {
+		display: flex;
+		gap: 12px;
+		margin-top: 20px;
+		
+	}
+
+	.hotspot {
+		width: 140px;
+		height: 120px;
+		border: 3px dashed rgba(0,0,0,0.4);
+		align-items: center;
+		justify-content: center;
+		background: #fff9;
+	}
+
+		.hotspot.over {
+			background: rgba(0,128,0,0.12);
+			border-color: green;
+		}
+
+		.starting-area{
+			height:200px;
+		}
+
+	.status {
+		margin-top: 12px;
+		font-family: "Courier New", monospace;
+	}
+</style>
+
+<div class="desktop-area">
+	<div class="starting-area">
+		<div id="folder" class="folder" draggable="true">Folder</div>
+		</div>
+	
+
+	<div class="hotspots" style="flex-wrap:wrap;">
+		<div id="hotspot-1" class="hotspot">Hotspot 1</div>
+		<div id="hotspot-2" class="hotspot">Hotspot 2</div>
+		<div id="hotspot-3" class="hotspot">Hotspot 3</div>
+		<div id="hotspot-4" class="hotspot">Hotspot 4</div>
+		<div id="hotspot-5" class="hotspot">Hotspot 5</div>
+	</div>
+
+	<div class="status">@statusMessage</div>
+</div>
+
+<script>
+	(function () {
+	  window._folderDrag = window._folderDrag || {};
+
+	  window.registerFolderDrag = function (dotNetRef) {
+		// cleanup first
+		window.unregisterFolderDrag();
+
+		var folder = document.getElementById('folder');
+		if (!folder) return;
+
+		var onDragStart = function (e) {
+		  if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'folder');
+		  folder.classList.add('dragging');
+		};
+		var onDragEnd = function (e) { folder.classList.remove('dragging'); };
+
+		folder.addEventListener('dragstart', onDragStart);
+		folder.addEventListener('dragend', onDragEnd);
+
+		var hotspots = [];
+		for (var i = 1; i <= 5; i++) {
+		  var id = 'hotspot-' + i;
+		  var el = document.getElementById(id);
+		  if (!el) continue;
+
+		  var onDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
+		  var onDragLeave = function (ev) { this.classList.remove('over'); };
+		  var onDrop = function (ev) {
+			ev.preventDefault();
+			this.classList.remove('over');
+
+			try {
+			  // Move the folder element into the hotspot so it visually 'lands' there
+			  var folderEl = document.getElementById('folder');
+			  if (folderEl) {
+				// appendChild will move the node if it's already somewhere else
+				this.appendChild(folderEl);
+				// center via flexbox styles of hotspot; ensure no leftover positioning
+				folderEl.style.position = '';
+				folderEl.style.left = '';
+				folderEl.style.top = '';
+				folderEl.style.margin = 'auto';
+			  }
+
+			  dotNetRef.invokeMethodAsync('OnFolderDropped', this.id).catch(function () { });
+			}
+			catch (e) { }
+		  };
+
+		  el.addEventListener('dragover', onDragOver);
+		  el.addEventListener('dragleave', onDragLeave);
+		  el.addEventListener('drop', onDrop);
+
+		  hotspots.push({ el: el, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop });
+		}
+
+		window._folderDrag = { folder: folder, folderHandlers: { onDragStart: onDragStart, onDragEnd: onDragEnd }, hotspots: hotspots, dotNetRef: dotNetRef };
+	  };
+
+	  window.unregisterFolderDrag = function () {
+		var state = window._folderDrag;
+		if (!state) return;
+		try {
+		  if (state.folder && state.folderHandlers) {
+			state.folder.removeEventListener('dragstart', state.folderHandlers.onDragStart);
+			state.folder.removeEventListener('dragend', state.folderHandlers.onDragEnd);
+		  }
+		  if (state.hotspots) {
+			state.hotspots.forEach(function (h) {
+			  h.el.removeEventListener('dragover', h.onDragOver);
+			  h.el.removeEventListener('dragleave', h.onDragLeave);
+			  h.el.removeEventListener('drop', h.onDrop);
+			});
+		  }
+		} catch (e) { }
+		window._folderDrag = {};
+	  };
+	})();
+</script>
+
+@code {
+	private string statusMessage = "Drag the folder into a hotspot.";
+	private DotNetObjectReference<DraggableDesktop>? objRef;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			objRef = DotNetObjectReference.Create(this);
+			await JS.InvokeVoidAsync("registerFolderDrag", objRef);
+		}
+	}
+
+	[JSInvokable]
+	public Task OnFolderDropped(string hotspotId)
+	{
+		statusMessage = $"Folder dropped on: {hotspotId}";
+		StateHasChanged();
+		return Task.CompletedTask;
+	}
+
+	public void Dispose()
+	{
+		try { JS.InvokeVoidAsync("unregisterFolderDrag"); } catch { }
+		objRef?.Dispose();
+	}
+}

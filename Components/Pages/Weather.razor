@@ -2,11 +2,11 @@
 @attribute [StreamRendering]
 
 <PageTitle>Weather</PageTitle>
+<SectionContent SectionName="page-title">Weather</SectionContent>
 
 
-<h1>Weather</h1>
 
-<p>This component demonstrates showing data.</p>
+
 
 @if (forecasts == null)
 {
@@ -46,12 +46,15 @@ else
         await Task.Delay(500);
 
         var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        forecasts = Enumerable.Range(1, 5).Select(index =>
         {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
+            var tempC = Random.Shared.Next(-20, 55);
+            return new WeatherForecast
+            {
+                Date = startDate.AddDays(index),
+                TemperatureC = tempC,
+                Summary = GetWeatherSummary(tempC)
+            };
         }).ToArray();
     }
 
@@ -62,4 +65,20 @@ else
         public string? Summary { get; set; }
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
     }
+
+    private static string GetWeatherSummary(int tempC)
+    {
+        // Determine a human-friendly summary string based on temperature in C
+        if (tempC <= -10) return "Freezing";
+        if (tempC <= 0) return "Bracing";
+        if (tempC <= 5) return "Chilly";
+        if (tempC <= 10) return "Cool";
+        if (tempC <= 15) return "Mild";
+        if (tempC <= 20) return "Temperate";
+        if (tempC <= 25) return "Warm";
+        if (tempC <= 30) return "Balmy";
+        if (tempC <= 40) return "Sweltering";
+        return "Scorching";
+    }
+
 }
