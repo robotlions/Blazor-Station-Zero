@@ -1,0 +1,77 @@
+@page "/iteration"
+@rendermode InteractiveServer
+
+<PageTitle>Iteration</PageTitle>
+<SectionContent SectionName="page-title">Simulated Database Iteration</SectionContent>
+
+
+@if (people is null)
+{
+	<p><em>Loading people...</em></p>
+}
+else
+{
+	<div class="iteration-container" style="display:flex;gap:24px;align-items:flex-start;">
+		<div class="names-list" style="min-width:200px;">
+			<h4>People</h4>
+			<ul style="padding-left:16px;">
+				@foreach (var person in people)
+				{
+					<li style="margin:6px 0;">
+						<button class="btn btn-link" style="padding:0;font-family:inherit;" @onclick="() => SetActive(person)">@person.Name</button>
+					</li>
+				}
+			</ul>
+		</div>
+
+		<div class="details-panel" style="flex:1;border:1px solid #ccc;padding:12px;border-radius:4px;min-height:120px;">
+			<h4>Details</h4>
+			@if (activePerson is null)
+			{
+				<p><em>Select a person to see details.</em></p>
+			}
+			else
+			{
+				<div><strong>Name:</strong> @activePerson.Name</div>
+				<div><strong>Hometown:</strong> @activePerson.Hometown</div>
+				<div><strong>Favorite pet:</strong> @activePerson.FavoritePet</div>
+			}
+		</div>
+	</div>
+}
+
+@code {
+	private List<Person>? people;
+	private Person? activePerson;
+
+	protected override async Task OnInitializedAsync()
+	{
+		// Simulate an async database call with a short delay
+		people = await GetPeopleAsync();
+	}
+
+	private void SetActive(Person person)
+	{
+		activePerson = person;
+	}
+
+	private async Task<List<Person>> GetPeopleAsync()
+	{
+		await Task.Delay(600);
+
+		// Local data simulating rows returned from a database
+		return new List<Person>
+		{
+			new Person { Name = "Alex Mercer", Hometown = "Riverton", FavoritePet = "Cat" },
+			new Person { Name = "Jamie Rivera", Hometown = "Lakeside", FavoritePet = "Dog" },
+			new Person { Name = "Sam Patel", Hometown = "Hillview", FavoritePet = "Parrot" }
+		};
+	}
+
+	private class Person
+	{
+		public string? Name { get; set; }
+		public string? Hometown { get; set; }
+		public string? FavoritePet { get; set; }
+	}
+}

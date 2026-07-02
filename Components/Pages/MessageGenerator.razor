@@ -1,0 +1,32 @@
+﻿@page "/message-generator"
+@rendermode InteractiveServer
+
+<PageTitle>Message Generator</PageTitle>
+<SectionContent SectionName="page-title">Random Message Generator</SectionContent>
+
+
+
+<div>
+	<p>Random Word: <strong>@selectedWord</strong></p>
+	<button class="btn btn-primary" @onclick="GetRandomWord">Generate random word</button>
+</div>
+
+@code {
+	private string selectedWord = "";
+
+	private string[] words = new[]
+	{
+		"Loading", "Thinking", "Doing stuff", "Calculating", "Working", "Recombobulating", "Reticulating splines", "Working on it",
+		"Trying stuff", "Winding up", "Processing", "Preparing", "Retrieving", "Generating", "Rendering", "Syncing", "Compiling",
+		"Analyzing", "Building", "Assembling", "Initializing", "Finalizing", "Checking"
+
+	};
+
+	private async Task GetRandomWord()
+	{
+		Random random = new Random();
+		int index = random.Next(0, words.Length);
+		selectedWord = words[index] + "...";
+		await Task.Delay(0);
+	}
+}

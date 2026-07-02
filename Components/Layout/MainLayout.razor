@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+
+
+<div class="page">
+    <main>
+        <div class="top-row row">
+            <div class="col-auto">
+            <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+                <i class="bi bi-list"></i>&nbsp;Apps
+            </button>
+            </div>
+            <div class="col-auto ms-auto">
+              <h3><SectionOutlet SectionName="page-title" /></h3>
+            </div>
+        </div>
+        <NavMenu />
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@* This is the default content if a page does not have a SectionContent
+Navigating to a page that does have SectionContent will override this value. *@
+<SectionContent SectionName="page-title">
+    <span>Blazor Station Zero
+    </span>
+</SectionContent>
+
