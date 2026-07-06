@@ -1,0 +1,35 @@
+@using Blazor_Station_Zero.Components.Services
+@using Blazor_Station_Zero.Components.Models
+@inject IProductService ProductService
+
+@page "/model-service"
+
+<PageTitle>Model and Service</PageTitle>
+<SectionContent SectionName="page-title">Model and Service</SectionContent>
+
+
+<h3>Product List</h3>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ul>
+        @foreach (var product in products)
+        {
+            <li>@product.Name - @product.Price:C</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Product>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetProductsAsync();
+    }
+}
+

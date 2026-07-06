@@ -1,4 +1,5 @@
 using Blazor_Station_Zero.Components;
+using Blazor_Station_Zero.Components.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 // (title service removed) 
+
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
