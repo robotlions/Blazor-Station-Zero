@@ -1,0 +1,41 @@
+
+<div class="input-container">
+	<input value="@ActiveValue" @oninput="OnInput" @onblur="OnBlur" class="form-control" placeholder="@ActivePropertyName" />
+	<button class="btn btn-success" @onclick="OnConfirm"><i class="bi bi-check-circle"></i></button>
+</div>
+
+@code{
+	[Parameter]
+	public bool IsEditing { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> IsEditingChanged { get; set; }
+
+	[Parameter]
+	public string? ActiveValue { get; set; }
+
+	[Parameter]
+	public EventCallback<string?> ActiveValueChanged { get; set; }
+
+	[Parameter]
+	public string? ActivePropertyName { get; set; }
+
+	private async Task OnInput(ChangeEventArgs e)
+	{
+		var newVal = e?.Value?.ToString();
+		ActiveValue = newVal;
+		await ActiveValueChanged.InvokeAsync(newVal);
+	}
+
+	private async Task OnBlur()
+	{
+		IsEditing = false;
+		await IsEditingChanged.InvokeAsync(false);
+	}
+
+	private async Task OnConfirm()
+	{
+		IsEditing = false;
+		await IsEditingChanged.InvokeAsync(false);
+	}
+}

@@ -4,27 +4,42 @@
 
 
 
-<h3>TextInput</h3>
+
+<p style="font-style:italic">Click property to edit</p>
 
 
 
-<p @onclick="() => ActivateEdit(nameof(PersonData.Name))">Name: @person.Name</p>
-<p @onclick="() => ActivateEdit(nameof(PersonData.Profession))">Profession: @person.Profession</p>
-
-@if (isEditing)
+@if (CheckIfActive(nameof(PersonData.Name)) == false)
 {
-	<div>
-		<label>@activePropertyName</label>
-		<input @bind="ActiveValue" @bind:event="oninput" class="form-control" />
+	<p @onclick="() => ActivateEdit(nameof(PersonData.Name))">Name: @person.Name</p>
+}
+else
+{
+	<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing" ActivePropertyName="@activePropertyName" />
+}
+@if (CheckIfActive(nameof(PersonData.Profession)) == false)
+{
+	<p @onclick="() => ActivateEdit(nameof(PersonData.Profession))">Profession: @person.Profession</p>
+}
+else
+{
+	<div class="input-container">
+		<input @bind="ActiveValue" @bind:event="oninput" @onblur="() => isEditing = false" class="form-control" placeholder="@activePropertyName" />
+		<button class="btn btn-success" @onclick="() => isEditing = false"><i class="bi bi-check-circle"></i></button>
 	</div>
 }
+<p @onclick="() => ToggleBool(nameof(PersonData.KnowsThisMuchIs))">Knows This Much Is: @person.KnowsThisMuchIs</p>
+
 
 @code {
-	private bool isEditing { get; set; } = false;
-	private string? activePropertyName;
-	private string? activeValue;
+	[Parameter]
+	public bool isEditing { get; set; } = false;
+	public string? activePropertyName;
+	public string? activeValue;
+	private bool isBoolEditing { get; set; } = false;
+	private bool activeBoolValue;
 
-	private string? ActiveValue
+	public string? ActiveValue
 	{
 		get => activeValue;
 		set
@@ -42,6 +57,7 @@
 		}
 	}
 
+
 	public class PersonData
 	{
 		public string Name { get; set; } = string.Empty;
@@ -50,16 +66,12 @@
 	}
 
 	PersonData person = new PersonData
-		{
-			Name = "Snerd",
-			Profession = "Blimp Folder",
-			KnowsThisMuchIs = true
-		};
-
-	private async Task ShowClickAlert()
 	{
-		await JsRuntime.InvokeVoidAsync("alert", "This is your critical message!");
-	}
+		Name = "Chuck Roast",
+		Profession = "Blimp Inflator",
+		KnowsThisMuchIs = true
+	};
+
 
 	private void ActivateEdit(string propertyName)
 	{
@@ -69,6 +81,8 @@
 			// turn off editing
 			activePropertyName = null;
 			activeValue = null;
+			isBoolEditing = false;
+			activeBoolValue = false;
 			isEditing = false;
 			return;
 		}
@@ -79,9 +93,48 @@
 		if (prop != null)
 		{
 			var val = prop.GetValue(person);
-			activeValue = val?.ToString();
+			// If the property is a boolean, prepare the checkbox path; otherwise use the text input
+			if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(Boolean))
+			{
+				isBoolEditing = true;
+				activeBoolValue = val is bool b ? b : false;
+				activeValue = null;
+			}
+			else
+			{
+				isBoolEditing = false;
+				activeValue = val?.ToString();
+			}
 		}
 
 		isEditing = true;
 	}
+
+	private void ToggleBool(string propertyName)
+	{
+		var prop = typeof(PersonData).GetProperty(propertyName);
+		if (prop != null && prop.CanWrite && (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(Boolean)))
+		{
+			var current = prop.GetValue(person);
+			bool val = current is bool b ? b : false;
+			prop.SetValue(person, !val);
+			// If the boolean is currently being edited, reflect the new value there as well
+			if (isEditing && activePropertyName == propertyName)
+			{
+				activeBoolValue = !val;
+			}
+			StateHasChanged();
+		}
+	}
+
+	private bool CheckIfActive(string propertyName)
+	{
+		if (activePropertyName == propertyName && isEditing)
+		{
+			return true;
+		}
+		else return false;
+	}
+
 }
+
