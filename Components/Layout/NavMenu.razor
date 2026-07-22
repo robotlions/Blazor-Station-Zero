@@ -1,4 +1,4 @@
-﻿<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
 
 	<div class="top-row ps-3 navbar navbar-dark">
 		<div class="container-fluid">
@@ -10,12 +10,17 @@
 	<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 
- 
+
 	<div class="nav-scrollable sidebar" onclick="document.querySelector('.navbar-toggler').click()">
 		<nav class="nav flex-column">
 			<div class="nav-item px-3">
 				<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
 					<i class="bi bi-house-door-fill side-nav-icon"></i>Home
+				</NavLink>
+			</div>
+			<div class="nav-item px-3">
+				<NavLink class="nav-link" href="textinput" Match="NavLinkMatch.All">
+					<i class="bi bi-pencil-square"></i>Text Input
 				</NavLink>
 			</div>
 			<div class="nav-item px-3">
@@ -32,18 +37,18 @@
 				<NavLink class="nav-link" href="iteration" Match="NavLinkMatch.All">
 					<i class="bi bi-list-nested side-nav-icon"></i>Iteration
 				</NavLink>
-			</div>	
+			</div>
 			<div class="nav-item px-3">
 				<NavLink class="nav-link" href="model-service" Match="NavLinkMatch.All">
 					<i class="bi bi-file-code-fill side-nav-icon"></i>Model and Service
 				</NavLink>
-			</div>	
+			</div>
 			<div class="nav-item px-3">
 				<NavLink class="nav-link" href="weather" Match="NavLinkMatch.All">
 					<i class="bi bi-cloud-drizzle-fill side-nav-icon"></i>Weather
 				</NavLink>
 			</div>
-			
+
 			<div class="nav-item px-3">
 				<NavLink class="nav-link" href="counter" Match="NavLinkMatch.All">
 					<i class="bi bi-plus-square-fill side-nav-icon"></i>Counter
@@ -52,14 +57,13 @@
 
 		</nav>
 	</div>
-
 </div>
 <style>
 	.nav-link {
 		display: initial !important;
-		
+
 	}
 	.side-nav-icon{
-	
+
 	}
 </style>

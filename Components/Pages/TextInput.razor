@@ -1,0 +1,87 @@
+﻿@page "/textinput"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime
+
+
+
+<h3>TextInput</h3>
+
+
+
+<p @onclick="() => ActivateEdit(nameof(PersonData.Name))">Name: @person.Name</p>
+<p @onclick="() => ActivateEdit(nameof(PersonData.Profession))">Profession: @person.Profession</p>
+
+@if (isEditing)
+{
+	<div>
+		<label>@activePropertyName</label>
+		<input @bind="ActiveValue" @bind:event="oninput" class="form-control" />
+	</div>
+}
+
+@code {
+	private bool isEditing { get; set; } = false;
+	private string? activePropertyName;
+	private string? activeValue;
+
+	private string? ActiveValue
+	{
+		get => activeValue;
+		set
+		{
+			activeValue = value;
+			if (string.IsNullOrEmpty(activePropertyName)) return;
+
+			// Use reflection to update the selected property on the person instance
+			var prop = typeof(PersonData).GetProperty(activePropertyName!);
+			if (prop != null && prop.CanWrite)
+			{
+				// Convert to the target type if necessary; properties here are strings so a simple coalesce is fine
+				prop.SetValue(person, activeValue ?? string.Empty);
+			}
+		}
+	}
+
+	public class PersonData
+	{
+		public string Name { get; set; } = string.Empty;
+		public string Profession { get; set; } = string.Empty;
+		public Boolean KnowsThisMuchIs { get; set; }
+	}
+
+	PersonData person = new PersonData
+		{
+			Name = "Snerd",
+			Profession = "Blimp Folder",
+			KnowsThisMuchIs = true
+		};
+
+	private async Task ShowClickAlert()
+	{
+		await JsRuntime.InvokeVoidAsync("alert", "This is your critical message!");
+	}
+
+	private void ActivateEdit(string propertyName)
+	{
+		// Toggle editing for the same property, or switch to a different property
+		if (activePropertyName == propertyName && isEditing)
+		{
+			// turn off editing
+			activePropertyName = null;
+			activeValue = null;
+			isEditing = false;
+			return;
+		}
+
+		activePropertyName = propertyName;
+		// seed the activeValue by reading the property value using reflection
+		var prop = typeof(PersonData).GetProperty(propertyName);
+		if (prop != null)
+		{
+			var val = prop.GetValue(person);
+			activeValue = val?.ToString();
+		}
+
+		isEditing = true;
+	}
+}
