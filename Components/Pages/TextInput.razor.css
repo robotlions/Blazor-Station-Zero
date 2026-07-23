@@ -1,0 +1,7 @@
+.personList li{
+    cursor:pointer
+}
+
+.personList li:hover{
+    color: lightgrey;
+}

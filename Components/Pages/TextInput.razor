@@ -6,7 +6,7 @@
 <div class="row">
 	<div class="col-md">
 		<h3>List of People</h3>
-		<ul>
+		<ul class="personList">
 			@foreach (var person in people)
 			{
 				<li @onclick="() => SetActivePerson(person)">@person.Name</li>
