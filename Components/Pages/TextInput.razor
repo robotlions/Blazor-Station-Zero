@@ -3,33 +3,55 @@
 @inject IJSRuntime JsRuntime
 
 
+<div class="row">
+	<div class="col-md">
+		<h3>List of People</h3>
+		<ul class="personList">
+			@foreach (var person in people)
+			{
+				<li @onclick="() => SetActivePerson(person)">@person.Name</li>
+			}
 
-
-<p style="font-style:italic">Click property to edit</p>
-
-
-
-@if (CheckIfActive(nameof(PersonData.Name)) == false)
-{
-	<p @onclick="() => ActivateEdit(nameof(PersonData.Name))">Name: @person.Name</p>
-}
-else
-{
-	<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing" ActivePropertyName="@activePropertyName" />
-}
-@if (CheckIfActive(nameof(PersonData.Profession)) == false)
-{
-	<p @onclick="() => ActivateEdit(nameof(PersonData.Profession))">Profession: @person.Profession</p>
-}
-else
-{
-	<div class="input-container">
-		<input @bind="ActiveValue" @bind:event="oninput" @onblur="() => isEditing = false" class="form-control" placeholder="@activePropertyName" />
-		<button class="btn btn-success" @onclick="() => isEditing = false"><i class="bi bi-check-circle"></i></button>
+		</ul>
 	</div>
-}
-<p @onclick="() => ToggleBool(nameof(PersonData.KnowsThisMuchIs))">Knows This Much Is: @person.KnowsThisMuchIs</p>
+	<div class="col-md">
+		@if (activePerson is not null)
+		{
+			<h3>Active Person</h3>
+			<p style="font-style:italic">Click property to edit</p>
 
+
+
+
+			@if (CheckIfActive(nameof(Person.Name)) == false)
+			{
+				<p @onclick="() => ActivateEdit(nameof(Person.Name))">Name: @activePerson.Name</p>
+			}
+			else
+			{
+				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing" ActivePropertyName="@activePropertyName" />
+			}
+			@if (CheckIfActive(nameof(Person.Profession)) == false)
+			{
+				<p @onclick="() => ActivateEdit(nameof(Person.Profession))">Profession: @activePerson.Profession</p>
+			}
+			else
+			{
+				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing" ActivePropertyName="@activePropertyName" />
+			}
+			<p @onclick="() => ToggleBool(nameof(Person.KnowsThisMuchIs))">Knows This Much Is: @activePerson.KnowsThisMuchIs</p>
+		}
+		else
+		{
+			<p>Click on a person, jerk</p>
+		}
+
+	</div>
+
+</div>
+
+		
+		
 
 @code {
 	[Parameter]
@@ -38,6 +60,7 @@ else
 	public string? activeValue;
 	private bool isBoolEditing { get; set; } = false;
 	private bool activeBoolValue;
+	public Person? activePerson = null;
 
 	public string? ActiveValue
 	{
@@ -48,28 +71,28 @@ else
 			if (string.IsNullOrEmpty(activePropertyName)) return;
 
 			// Use reflection to update the selected property on the person instance
-			var prop = typeof(PersonData).GetProperty(activePropertyName!);
+			var prop = typeof(Person).GetProperty(activePropertyName!);
 			if (prop != null && prop.CanWrite)
 			{
 				// Convert to the target type if necessary; properties here are strings so a simple coalesce is fine
-				prop.SetValue(person, activeValue ?? string.Empty);
+				prop.SetValue(activePerson, activeValue ?? string.Empty);
 			}
 		}
 	}
 
 
-	public class PersonData
+	public class Person
 	{
 		public string Name { get; set; } = string.Empty;
 		public string Profession { get; set; } = string.Empty;
 		public Boolean KnowsThisMuchIs { get; set; }
 	}
 
-	PersonData person = new PersonData
-	{
-		Name = "Chuck Roast",
-		Profession = "Blimp Inflator",
-		KnowsThisMuchIs = true
+	List<Person> people = new List<Person>{
+
+	new Person { Name = "First Person", Profession = "Jazz Musician", KnowsThisMuchIs = false},
+	new Person { Name = "Second Person", Profession = "Snowman Builder", KnowsThisMuchIs = true},
+	new Person { Name = "Third Person", Profession = "Professional Yoyoist", KnowsThisMuchIs = true}
 	};
 
 
@@ -89,10 +112,10 @@ else
 
 		activePropertyName = propertyName;
 		// seed the activeValue by reading the property value using reflection
-		var prop = typeof(PersonData).GetProperty(propertyName);
+		var prop = typeof(Person).GetProperty(propertyName);
 		if (prop != null)
 		{
-			var val = prop.GetValue(person);
+			var val = prop.GetValue(activePerson);
 			// If the property is a boolean, prepare the checkbox path; otherwise use the text input
 			if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(Boolean))
 			{
@@ -110,19 +133,21 @@ else
 		isEditing = true;
 	}
 
+	private void SetActivePerson(Person person)
+	{
+		activePerson = person;
+	}
+
 	private void ToggleBool(string propertyName)
 	{
-		var prop = typeof(PersonData).GetProperty(propertyName);
+		var prop = typeof(Person).GetProperty(propertyName);
 		if (prop != null && prop.CanWrite && (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(Boolean)))
 		{
-			var current = prop.GetValue(person);
+			var current = prop.GetValue(activePerson);
 			bool val = current is bool b ? b : false;
-			prop.SetValue(person, !val);
+			prop.SetValue(activePerson, !val);
 			// If the boolean is currently being edited, reflect the new value there as well
-			if (isEditing && activePropertyName == propertyName)
-			{
-				activeBoolValue = !val;
-			}
+			activeBoolValue = !val;
 			StateHasChanged();
 		}
 	}

@@ -1,6 +1,6 @@
 
 <div class="input-container">
-	<input value="@ActiveValue" @oninput="OnInput" @onblur="OnBlur" class="form-control" placeholder="@ActivePropertyName" />
+	<input value="@ActiveValue" @oninput="OnInput" @onblur="OnBlur" class="form-control" placeholder="@ActivePropertyName" @onkeydown="HandleKeyDown"/>
 	<button class="btn btn-success" @onclick="OnConfirm"><i class="bi bi-check-circle"></i></button>
 </div>
 
@@ -38,4 +38,16 @@
 		IsEditing = false;
 		await IsEditingChanged.InvokeAsync(false);
 	}
+
+	private async Task HandleKeyDown(KeyboardEventArgs e)
+	{
+		if (e.Key == "Enter")
+		{
+			await OnConfirm();
+		}
+	}
+
 }
+
+
+
