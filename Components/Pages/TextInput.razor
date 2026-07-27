@@ -29,7 +29,8 @@
 			}
 			else
 			{
-				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing" ActivePropertyName="@activePropertyName" />
+				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing"
+									ActivePropertyName="@activePropertyName" />
 			}
 			@if (CheckIfActive(nameof(Person.Profession)) == false)
 			{
@@ -37,9 +38,11 @@
 			}
 			else
 			{
-				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing" ActivePropertyName="@activePropertyName" />
+				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing"
+									ActivePropertyName="@activePropertyName" />
 			}
-			<p @onclick="() => ToggleBool(nameof(Person.KnowsThisMuchIs))">Knows This Much Is: @activePerson.KnowsThisMuchIs</p>
+			<p @onclick="() => ToggleBool(nameof(Person.KnowsThisMuchIs))">Knows This Much Is: @activePerson.KnowsThisMuchIs
+			</p>
 		}
 		else
 		{
