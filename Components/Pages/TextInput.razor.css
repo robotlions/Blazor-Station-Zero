@@ -1,3 +1,7 @@
+.clickableProperty{
+    cursor:pointer;
+}
+
 .personList li{
     cursor:pointer
 }

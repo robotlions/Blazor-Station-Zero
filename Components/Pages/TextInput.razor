@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime
 
-
+<PageTitle>Text Input</PageTitle>
 <div class="row">
 	<div class="col-md">
 		<h3>List of People</h3>
@@ -25,7 +25,7 @@
 
 			@if (CheckIfActive(nameof(Person.Name)) == false)
 			{
-				<p @onclick="() => ActivateEdit(nameof(Person.Name))">Name: @activePerson.Name</p>
+				<p class="clickableProperty" @onclick="() => ActivateEdit(nameof(Person.Name))">Name: @activePerson.Name</p>
 			}
 			else
 			{
@@ -34,24 +34,32 @@
 			}
 			@if (CheckIfActive(nameof(Person.Profession)) == false)
 			{
-				<p @onclick="() => ActivateEdit(nameof(Person.Profession))">Profession: @activePerson.Profession</p>
-			}
+				<p class="clickableProperty" @onclick="() => ActivateEdit(nameof(Person.Profession))">Profession:
+					@activePerson.Profession</p>
+				}
 			else
-			{
-				<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing"
-									ActivePropertyName="@activePropertyName" />
-			}
-			<p @onclick="() => ToggleBool(nameof(Person.KnowsThisMuchIs))">Knows This Much Is: @activePerson.KnowsThisMuchIs
-			</p>
-		}
+				{
+					<TextInputComponent @bind-ActiveValue="ActiveValue" @bind-IsEditing="isEditing"
+										ActivePropertyName="@activePropertyName" />
+				}
+				<div style="display: flex; align-items: center; gap: 10px;">
+					<p @onclick="() => ActivateEdit(nameof(Person.KnowsThisMuchIs))" style="margin: 0; cursor: pointer;">Knows
+						This Much Is: @activePerson.KnowsThisMuchIs</p>
+						<div class="form-check form-switch">
+							<input class="form-check-input" type="checkbox" id="knowsThisMuchSwitch"
+								   checked="@activePerson.KnowsThisMuchIs"
+								   @onchange="@((ChangeEventArgs e) => ToggleBool(nameof(Person.KnowsThisMuchIs)))" />
+						</div>
+					</div>
+				}
 		else
-		{
-			<p>Click on a person, jerk</p>
-		}
+				{
+					<p>Click on a person, jerk</p>
+				}
 
-	</div>
+			</div>
 
-</div>
+		</div>
 
 		
 		
