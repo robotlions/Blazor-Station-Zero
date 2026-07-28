@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
 // (title service removed) 
 
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
 
 var app = builder.Build();
 

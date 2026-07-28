@@ -1,4 +1,9 @@
-﻿@page "/textinput"
+﻿@using Blazor_Station_Zero.Components.Services
+@using Blazor_Station_Zero.Components.Models
+@inject IPersonService PersonService
+
+
+@page "/textinput"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime
 
@@ -72,6 +77,7 @@
 	private bool isBoolEditing { get; set; } = false;
 	private bool activeBoolValue;
 	public Person? activePerson = null;
+	private List<Person> people = new List<Person>();
 
 	public string? ActiveValue
 	{
@@ -92,19 +98,7 @@
 	}
 
 
-	public class Person
-	{
-		public string Name { get; set; } = string.Empty;
-		public string Profession { get; set; } = string.Empty;
-		public Boolean KnowsThisMuchIs { get; set; }
-	}
-
-	List<Person> people = new List<Person>{
-
-	new Person { Name = "First Person", Profession = "Jazz Musician", KnowsThisMuchIs = false},
-	new Person { Name = "Second Person", Profession = "Snowman Builder", KnowsThisMuchIs = true},
-	new Person { Name = "Third Person", Profession = "Professional Yoyoist", KnowsThisMuchIs = true}
-	};
+	
 
 
 	private void ActivateEdit(string propertyName)
@@ -171,6 +165,13 @@
 		}
 		else return false;
 	}
+
+	
+	protected override async Task OnInitializedAsync()
+	{
+		people = await PersonService.GetPeopleAsync();
+	}
+
 
 }
 

@@ -11,12 +11,12 @@ namespace Blazor_Station_Zero.Components.Services
     public class ProductService : IProductService
     {
         // Simulated in-memory data store
-        private readonly List<Product> _products = new()
-        {
+        private readonly List<Product> _products =
+        [
             new Product { Id = 1, Name = "Laptop", Price = 1200.50m },
             new Product { Id = 2, Name = "Mouse", Price = 25.99m },
             new Product { Id = 3, Name = "Keyboard", Price = 45.00m }
-        };
+        ];
 
         public Task<List<Product>> GetProductsAsync()
         {
