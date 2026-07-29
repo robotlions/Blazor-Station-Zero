@@ -5,15 +5,20 @@
     <main>
         <div class="top-row row align-items-center">
             <div class="col-auto">
-            <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-                <i class="bi bi-list"></i>&nbsp;Apps
-            </button>
+                <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"
+                        aria-controls="offcanvasExample">
+                    <i class="bi bi-list"></i>&nbsp;Apps
+                </button>
             </div>
+
             <div class="col-auto">
-              <h5 style="color:#333333;margin-block-end:0"><SectionOutlet SectionName="page-title" /></h5>
+                <h5 style="color:#333333;margin-block-end:0">
+                    <SectionOutlet SectionName="page-title" />
+                </h5>
             </div>
+
         </div>
-    
+
         <NavMenu />
         <article class="container-fluid pt-5">
             @Body

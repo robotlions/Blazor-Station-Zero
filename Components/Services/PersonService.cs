@@ -13,9 +13,27 @@ namespace Blazor_Station_Zero.Components.Services
         // Simulated in-memory data store
         private readonly List<Person> _people = new()
         {
-           new Person { Id = 1, Name = "First Person", Profession = "Jazz Musician", KnowsThisMuchIs = false},
-	new Person { Id = 2, Name = "Second Person", Profession = "Snowman Builder", KnowsThisMuchIs = true},
-	new Person { Id = 3, Name = "Third Person", Profession = "Professional Yoyoist", KnowsThisMuchIs = true}
+            new Person
+            {
+                Id = 1,
+                Name = "First Person",
+                Profession = "Jazz Musician",
+                KnowsThisMuchIs = false,
+            },
+            new Person
+            {
+                Id = 2,
+                Name = "Second Person",
+                Profession = "Snowman Builder",
+                KnowsThisMuchIs = true,
+            },
+            new Person
+            {
+                Id = 3,
+                Name = "Third Person",
+                Profession = "Professional Yoyoist",
+                KnowsThisMuchIs = true,
+            },
         };
 
         public Task<List<Person>> GetPeopleAsync()
