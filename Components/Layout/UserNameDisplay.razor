@@ -1,0 +1,17 @@
+@rendermode InteractiveServer
+@inject Components.Services.UserNameState UserNameState
+@implements IDisposable
+
+<span class="fw-semibold">@UserNameState.UserName</span>
+
+@code {
+    protected override void OnInitialized()
+    {
+        UserNameState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        UserNameState.OnChange -= StateHasChanged;
+    }
+}

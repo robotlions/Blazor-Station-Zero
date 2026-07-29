@@ -10,6 +10,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped<UserNameState>();
 
 var app = builder.Build();
 

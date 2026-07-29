@@ -1,8 +1,15 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject Components.Services.UserNameState UserNameState
 
 <PageTitle>Blazor Station Zero</PageTitle>
 <SectionContent SectionName="page-title">Home</SectionContent>
 
 <div class="cat-background-image">
+</div>
+
+<div class="container-fluid pt-3">
+    <label for="userNameInput">User Name:</label>
+    <input id="userNameInput" class="form-control" type="text" @bind="UserNameState.UserName" @bind:event="oninput" />
 </div>
 
