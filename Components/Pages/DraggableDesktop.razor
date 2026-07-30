@@ -31,6 +31,10 @@
 		opacity: 0.6;
 	}
 
+	.trash.dragging {
+		opacity: 0.6;
+	}
+
 	.hotspots {
 		position: absolute;
 		inset: 0;
@@ -167,6 +171,7 @@
 <script>
 	(function () {
 		window._folderDrag = window._folderDrag || {};
+		var _isDraggingTrash = false;
 
 		window.registerFolderDrag = function (dotNetRef) {
 			// cleanup first
@@ -202,6 +207,7 @@
 				var onDrop = function (ev) {
 					ev.preventDefault();
 					this.classList.remove('over');
+					if (_isDraggingTrash) return;
 					try {
 						dotNetRef.invokeMethodAsync('OnFolderDropped', this.id).catch(function () { });
 					}
@@ -226,16 +232,17 @@
 				hotspots.push({ el: el, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop });
 			});
 
-			// register trash container as a drop target (after hotspots)
+			// register trash container as a drop target and drag source
 			var trash = document.getElementById('trash-container');
+			var trashDragHandlers = null;
 			if (trash) {
-				var onTrashDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
+				var onTrashDragOver = function (ev) { if (_isDraggingTrash) return; ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
 				var onTrashLeave = function (ev) { this.classList.remove('over'); };
 				var onTrashDrop = function (ev) {
+					if (_isDraggingTrash) return;
 					ev.preventDefault();
 					this.classList.remove('over');
 					try {
-						// notify Blazor that the folder was dropped in the trash; Blazor will hide it
 						dotNetRef.invokeMethodAsync('OnFolderDeleted').catch(function () { });
 					} catch (e) { }
 				};
@@ -243,11 +250,39 @@
 				trash.addEventListener('dragover', onTrashDragOver);
 				trash.addEventListener('dragleave', onTrashLeave);
 				trash.addEventListener('drop', onTrashDrop);
-
 				hotspots.push({ el: trash, onDragOver: onTrashDragOver, onDragLeave: onTrashLeave, onDrop: onTrashDrop });
+
+				// trash as drag source — repositions it within the desktop
+				var trashOffsetX = 0, trashOffsetY = 0;
+				var desktopEl = document.querySelector('.desktop-area');
+				var onTrashDragStart = function (e) {
+					_isDraggingTrash = true;
+					trash.classList.add('dragging');
+					var rect = trash.getBoundingClientRect();
+					trashOffsetX = e.clientX - rect.left;
+					trashOffsetY = e.clientY - rect.top;
+					if (e.dataTransfer) { e.dataTransfer.setData('text/plain', 'trash'); e.dataTransfer.effectAllowed = 'move'; }
+				};
+				var onTrashDragEnd = function (e) {
+					_isDraggingTrash = false;
+					trash.classList.remove('dragging');
+					if (desktopEl && e.clientX !== 0 && e.clientY !== 0) {
+						var dr = desktopEl.getBoundingClientRect();
+						var newLeft = Math.max(0, Math.min(e.clientX - dr.left - trashOffsetX, dr.width - trash.offsetWidth));
+						var newTop = Math.max(0, Math.min(e.clientY - dr.top - trashOffsetY, dr.height - trash.offsetHeight));
+						trash.style.right = 'auto';
+						trash.style.bottom = 'auto';
+						trash.style.left = newLeft + 'px';
+						trash.style.top = newTop + 'px';
+					}
+				};
+				trash.setAttribute('draggable', 'true');
+				trash.addEventListener('dragstart', onTrashDragStart);
+				trash.addEventListener('dragend', onTrashDragEnd);
+				trashDragHandlers = { el: trash, onDragStart: onTrashDragStart, onDragEnd: onTrashDragEnd };
 			}
 
-			window._folderDrag = { /* folder: folder, */ folderHandlers: folderHandlers, hotspots: hotspots, dotNetRef: dotNetRef };
+			window._folderDrag = { folderHandlers: folderHandlers, hotspots: hotspots, dotNetRef: dotNetRef, trashDragHandlers: trashDragHandlers };
 		};
 
 
@@ -265,6 +300,10 @@
 						h.el.removeEventListener('dragleave', h.onDragLeave);
 						h.el.removeEventListener('drop', h.onDrop);
 					});
+				}
+				if (state.trashDragHandlers) {
+					try { state.trashDragHandlers.el.removeEventListener('dragstart', state.trashDragHandlers.onDragStart); } catch (e) { }
+					try { state.trashDragHandlers.el.removeEventListener('dragend', state.trashDragHandlers.onDragEnd); } catch (e) { }
 				}
 			} catch (e) { }
 			window._folderDrag = {};
