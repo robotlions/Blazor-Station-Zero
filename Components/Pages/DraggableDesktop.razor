@@ -34,11 +34,7 @@
 			</svg>
 		</span>
 		<a href="/" class="menu-link">Home</a>
-		<a href="/textinput" class="menu-link">Text Input</a>
-		<a href="/message-generator" class="menu-link">Message Generator</a>
-		<a href="/iteration" class="menu-link">Iteration</a>
-		<a href="/weather" class="menu-link">Weather</a>
-		<a href="/counter" class="menu-link">Counter</a>
+		<button type="button" class="menu-link menu-link-button" @onclick="OpenLauncher">Applications</button>
 	</div>
 </div>
 <div class="row">
@@ -52,23 +48,27 @@
 				{
 					<!-- Folder containing a file: paper corner sticking up from inside -->
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-						<rect x="52" y="1" width="34" height="28" rx="1" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5" />
-						<path d="M78 1 L86 1 L86 9 Z" fill="#ddd" stroke="#aaa" stroke-width="1" />
-						<line x1="57" y1="12" x2="82" y2="12" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
-						<line x1="57" y1="17" x2="82" y2="17" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
-						<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-						<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111"
-							  stroke-width="2.5" stroke-linejoin="round" />
-						<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+						<rect x="49" y="4" width="35" height="26" rx="1.5" fill="#f7f8fb" stroke="#6f7784" stroke-width="1.25" />
+						<path d="M76 4 L84 4 L84 12 L76 12 Z" fill="#dde1e8" stroke="#6f7784" stroke-width="1" />
+						<line x1="54" y1="14" x2="80" y2="14" stroke="#b8bec8" stroke-width="1.15" />
+						<line x1="54" y1="18" x2="80" y2="18" stroke="#b8bec8" stroke-width="1.15" />
+						<path d="M4 24 L4 13 Q4 9 8 9 L35 9 Q42 9 46 14 L50 24 Z" fill="#f7d869" stroke="#70757e" stroke-width="2.25" stroke-linejoin="round" />
+						<rect x="4" y="24" width="88" height="51" rx="2.5" fill="#f2c546" stroke="#70757e" stroke-width="2.25" />
+						<rect x="7" y="27" width="82" height="7" rx="1" fill="#ffe291" opacity="0.95" />
+						<line x1="7" y1="35" x2="89" y2="35" stroke="#cfa13c" stroke-width="1.4" opacity="0.85" />
+						<line x1="7" y1="68" x2="89" y2="68" stroke="#d6aa41" stroke-width="2" opacity="0.85" />
+						<line x1="6" y1="26" x2="6" y2="73" stroke="#fff0bc" stroke-width="1" opacity="0.8" />
 					</svg>
 				}
 				else
 				{
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-						<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-						<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111"
-							  stroke-width="2.5" stroke-linejoin="round" />
-						<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+						<path d="M4 24 L4 13 Q4 9 8 9 L35 9 Q42 9 46 14 L50 24 Z" fill="#f7d869" stroke="#70757e" stroke-width="2.25" stroke-linejoin="round" />
+						<rect x="4" y="24" width="88" height="51" rx="2.5" fill="#f2c546" stroke="#70757e" stroke-width="2.25" />
+						<rect x="7" y="27" width="82" height="7" rx="1" fill="#ffe291" opacity="0.95" />
+						<line x1="7" y1="35" x2="89" y2="35" stroke="#cfa13c" stroke-width="1.4" opacity="0.85" />
+						<line x1="7" y1="68" x2="89" y2="68" stroke="#d6aa41" stroke-width="2" opacity="0.85" />
+						<line x1="6" y1="26" x2="6" y2="73" stroke="#fff0bc" stroke-width="1" opacity="0.8" />
 					</svg>
 				}
 			</div>
@@ -79,13 +79,18 @@
 			<div id="text-file" class="text-file" draggable="true" @ondblclick="OpenNotepad"
 				 style="position:absolute; left:@((int)textFileLeft)px; top:@((int)textFileTop)px; z-index:10;">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 68" width="56" height="68">
-					<path d="M4 2 L40 2 L54 16 L54 66 L4 66 Z" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5"
-						  stroke-linejoin="round" />
-					<path d="M40 2 L40 16 L54 16 Z" fill="#ddd" stroke="#aaa" stroke-width="1.5" stroke-linejoin="round" />
-					<line x1="11" y1="26" x2="46" y2="26" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-					<line x1="11" y1="34" x2="46" y2="34" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-					<line x1="11" y1="42" x2="46" y2="42" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-					<line x1="11" y1="50" x2="34" y2="50" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+					<path d="M4 2 L39 2 L53 16 L53 66 L4 66 Z" fill="#f9fafc" stroke="#6f7784" stroke-width="1.75" stroke-linejoin="round" />
+					<path d="M39 2 L53 16 L39 16 Z" fill="#dbe0e8" stroke="#6f7784" stroke-width="1.4" stroke-linejoin="round" />
+					<rect x="7" y="6" width="29" height="3" fill="#ffffff" opacity="0.7" />
+					<rect x="9" y="22" width="10" height="10" rx="1" fill="#e7ebf0" stroke="#8b93a0" stroke-width="1" />
+					<rect x="11" y="24" width="6" height="1.5" fill="#a1a9b6" />
+					<rect x="11" y="27" width="6" height="1.5" fill="#a1a9b6" />
+					<line x1="22" y1="25" x2="46" y2="25" stroke="#aeb6c3" stroke-width="1.5" />
+					<line x1="22" y1="30" x2="46" y2="30" stroke="#aeb6c3" stroke-width="1.5" />
+					<line x1="9" y1="37" x2="46" y2="37" stroke="#aeb6c3" stroke-width="1.5" />
+					<line x1="9" y1="43" x2="46" y2="43" stroke="#aeb6c3" stroke-width="1.5" />
+					<line x1="9" y1="49" x2="35" y2="49" stroke="#aeb6c3" stroke-width="1.5" />
+					<line x1="6" y1="5" x2="6" y2="63" stroke="#ffffff" stroke-width="1" opacity="0.55" />
 				</svg>
 			</div>
 		}
@@ -98,33 +103,94 @@
 			{
 				<!-- Full trash: lid ajar, folder tab peeking out -->
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
-					<path d="M28 22 L28 17 Q28 14 31 14 L46 14 Q51 14 53 17 L56 22 Z" fill="#ffd86b" stroke="#111"
-						  stroke-width="1.5" stroke-linejoin="round" />
-					<path d="M10 28 L15 82 L65 82 L70 28 Z" fill="#cc3333" stroke="#222" stroke-width="2.5"
-						  stroke-linejoin="round" />
-					<rect x="4" y="19" width="68" height="9" rx="3" fill="#bb2222" stroke="#222" stroke-width="2"
-						  transform="rotate(-6 38 23)" />
-					<rect x="24" y="7" width="28" height="9" rx="4" fill="#992222" stroke="#222" stroke-width="2"
-						  transform="rotate(-6 38 11)" />
-					<line x1="30" y1="35" x2="28" y2="75" stroke="#aa2222" stroke-width="2" />
-					<line x1="40" y1="35" x2="40" y2="75" stroke="#aa2222" stroke-width="2" />
-					<line x1="50" y1="35" x2="52" y2="75" stroke="#aa2222" stroke-width="2" />
+					<rect x="24" y="8" width="28" height="9" rx="4" fill="#c3c8d0" stroke="#6b737f" stroke-width="2" transform="rotate(-6 38 12)" />
+					<rect x="8" y="18" width="60" height="10" rx="3" fill="#dde2ea" stroke="#6b737f" stroke-width="2" transform="rotate(-6 38 23)" />
+					<path d="M12 28 L14 82 L66 82 L68 28 Z" fill="#e4e8ef" stroke="#6b737f" stroke-width="2.5" stroke-linejoin="round" />
+					<line x1="22" y1="30" x2="58" y2="30" stroke="#ffffff" stroke-width="1.5" opacity="0.85" />
+					<line x1="30" y1="35" x2="29" y2="75" stroke="#98a1ae" stroke-width="2" />
+					<line x1="40" y1="35" x2="40" y2="75" stroke="#98a1ae" stroke-width="2" />
+					<line x1="50" y1="35" x2="51" y2="75" stroke="#98a1ae" stroke-width="2" />
+					<path d="M27 24 L27 18 Q27 15 31 15 L46 15 Q51 15 53 18 L55 24 Z" fill="#f0d278" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
+					<rect x="25" y="43" width="10" height="14" rx="1" fill="#fbfbfd" stroke="#6b737f" stroke-width="1" transform="rotate(-8 30 50)" />
+					<line x1="27" y1="47" x2="33" y2="47" stroke="#d9dee5" stroke-width="1" />
+					<rect x="43" y="48" width="9" height="12" rx="1" fill="#fbfbfd" stroke="#6b737f" stroke-width="1" transform="rotate(9 47.5 54)" />
 				</svg>
 			}
 			else
 			{
 				<!-- Empty trash -->
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
-					<rect x="24" y="4" width="28" height="9" rx="4" fill="#aaa" stroke="#222" stroke-width="2" />
-					<rect x="4" y="11" width="68" height="9" rx="3" fill="#ccc" stroke="#222" stroke-width="2" />
-					<path d="M10 20 L15 82 L65 82 L70 20 Z" fill="#ddd" stroke="#222" stroke-width="2.5"
+					<rect x="24" y="4" width="28" height="9" rx="4" fill="#c3c8d0" stroke="#6b737f" stroke-width="2" />
+					<rect x="8" y="11" width="60" height="9" rx="3" fill="#dde2ea" stroke="#6b737f" stroke-width="2" />
+					<path d="M12 20 L14 82 L66 82 L68 20 Z" fill="#e4e8ef" stroke="#6b737f" stroke-width="2.5"
 						  stroke-linejoin="round" />
-					<line x1="30" y1="27" x2="28" y2="75" stroke="#aaa" stroke-width="2" />
-					<line x1="40" y1="27" x2="40" y2="75" stroke="#aaa" stroke-width="2" />
-					<line x1="50" y1="27" x2="52" y2="75" stroke="#aaa" stroke-width="2" />
+					<line x1="22" y1="22" x2="58" y2="22" stroke="#ffffff" stroke-width="1.5" opacity="0.8" />
+					<line x1="30" y1="27" x2="29" y2="75" stroke="#98a1ae" stroke-width="2" />
+					<line x1="40" y1="27" x2="40" y2="75" stroke="#98a1ae" stroke-width="2" />
+					<line x1="50" y1="27" x2="51" y2="75" stroke="#98a1ae" stroke-width="2" />
 				</svg>
 			}
 		</div>
+
+		@if (launcherOpen)
+		{
+			<div class="launcher-window">
+				<div class="launcher-titlebar">
+					<span>APPLICATIONS</span>
+					<button class="launcher-close" @onclick="CloseLauncher">✕</button>
+				</div>
+				<div class="launcher-content">
+					<a href="/textinput" class="launcher-link">
+						<span class="launcher-icon" aria-hidden="true">
+							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+								<rect x="3" y="3" width="26" height="26" rx="2" fill="#e7ebf2" stroke="#6b737f" stroke-width="1.5" />
+								<rect x="6" y="6" width="20" height="4" fill="#c3c8d0" />
+								<line x1="8" y1="15" x2="24" y2="15" stroke="#9aa3b1" stroke-width="1.5" />
+								<line x1="8" y1="19" x2="24" y2="19" stroke="#9aa3b1" stroke-width="1.5" />
+								<line x1="8" y1="23" x2="19" y2="23" stroke="#9aa3b1" stroke-width="1.5" />
+							</svg>
+						</span>
+						<span class="launcher-label">TextInput</span>
+					</a>
+					<a href="/message-generator" class="launcher-link">
+						<span class="launcher-icon" aria-hidden="true">
+							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+								<rect x="3" y="4" width="26" height="19" rx="2" fill="#e7ebf2" stroke="#6b737f" stroke-width="1.5" />
+								<path d="M10 23 L10 28 L15 23 Z" fill="#e7ebf2" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
+								<line x1="8" y1="10" x2="24" y2="10" stroke="#9aa3b1" stroke-width="1.5" />
+								<line x1="8" y1="14" x2="22" y2="14" stroke="#9aa3b1" stroke-width="1.5" />
+								<line x1="8" y1="18" x2="18" y2="18" stroke="#9aa3b1" stroke-width="1.5" />
+							</svg>
+						</span>
+						<span class="launcher-label">MessageGenerator</span>
+					</a>
+					<a href="/weather" class="launcher-link">
+						<span class="launcher-icon" aria-hidden="true">
+							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+								<circle cx="10" cy="12" r="3.5" fill="#f2c546" stroke="#9a8b4f" stroke-width="1.2" />
+								<path d="M11 22 H24 C26.8 22 29 20.2 29 18 C29 15.8 27.2 14 24.8 14 C24.2 11.2 21.8 9 18.8 9 C15.8 9 13.4 11 12.8 13.7 C10 13.8 8 15.7 8 18 C8 20.2 9.9 22 11 22 Z" fill="#e6ebf2" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
+							</svg>
+						</span>
+						<span class="launcher-label">Weather</span>
+					</a>
+					<a href="/counter" class="launcher-link">
+						<span class="launcher-icon" aria-hidden="true">
+							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+								<rect x="5" y="3" width="22" height="26" rx="2" fill="#dfe4ec" stroke="#6b737f" stroke-width="1.5" />
+								<rect x="8" y="6" width="16" height="6" fill="#f7f9fc" stroke="#9aa3b1" stroke-width="1" />
+								<rect x="8" y="15" width="4" height="4" fill="#bfc6d1" />
+								<rect x="14" y="15" width="4" height="4" fill="#bfc6d1" />
+								<rect x="20" y="15" width="4" height="4" fill="#bfc6d1" />
+								<rect x="8" y="21" width="4" height="4" fill="#bfc6d1" />
+								<rect x="14" y="21" width="4" height="4" fill="#bfc6d1" />
+								<rect x="20" y="21" width="4" height="4" fill="#f2c546" stroke="#9a8b4f" stroke-width="0.8" />
+							</svg>
+						</span>
+						<span class="launcher-label">Counter</span>
+					</a>
+				</div>
+			</div>
+		}
 	</div>
 </div>
 
@@ -148,6 +214,7 @@
 	private bool notepadOpen = false;
 	private bool _focusNotepad = false;
 	private string notepadContent = "";
+	private bool launcherOpen = true;
 	private bool folderVisible = true;
 	private double folderLeft = 12.0;
 	private double folderTop = 12.0;
@@ -181,6 +248,10 @@
 	}
 
 	private void CloseNotepad() => notepadOpen = false;
+
+	private void CloseLauncher() => launcherOpen = false;
+
+	private void OpenLauncher() => launcherOpen = true;
 
 	[JSInvokable]
 	public Task OnFolderMoved(double left, double top)
