@@ -13,18 +13,18 @@
 <style>
 	.desktop-area {
 		min-height: 320px;
-		padding: 24px;
-		background: linear-gradient(180deg,#7fb7ff,#cfeaff);
+		background: linear-gradient(180deg, #7fb7ff, #cfeaff);
 		position: relative;
 		height: 70vh;
+		overflow: hidden;
 	}
 
 	.folder {
 		width: 96px;
 		height: 72px;
-		background: linear-gradient(#ffd86b,#f0b02b);
+		background: linear-gradient(#ffd86b, #f0b02b);
 		border: 3px solid #000;
-		box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
+		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.25);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -33,38 +33,45 @@
 		cursor: grab;
 	}
 
-		.folder.dragging {
-			opacity: 0.6;
-		}
+	.folder.dragging {
+		opacity: 0.6;
+	}
 
 	.hotspots {
-		display: flex;
-		gap: 12px;
-		margin-top: 20px;
-		
+		position: absolute;
+		inset: 0;
+		display: grid;
+		grid-template-columns: repeat(8, 1fr);
+		grid-template-rows: repeat(6, 1fr);
 	}
 
 	.hotspot {
-		width: 140px;
-		height: 120px;
-		border: 3px dashed rgba(0,0,0,0.4);
+		border: 1px dashed rgba(0, 0, 0, 0.2);
+		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #fff9;
 	}
 
-		.hotspot.over {
-			background: rgba(0,128,0,0.12);
-			border-color: green;
-		}
+	.hotspot.over {
+		background: rgba(0, 128, 0, 0.12);
+		border-color: green;
+	}
 
-		.starting-area{
-			height:100px;
-		}
+	.starting-area {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		z-index: 10;
+	}
 
 	.status {
-		margin-top: 12px;
+		position: absolute;
+		bottom: 130px;
+		left: 12px;
+		z-index: 10;
 		font-family: "Courier New", monospace;
+		background: rgba(255, 255, 255, 0.7);
+		padding: 4px 8px;
 	}
 
 	/* Trash container */
@@ -74,191 +81,201 @@
 		bottom: 24px;
 		width: 120px;
 		height: 100px;
-		border: 3px solid rgba(0,0,0,0.6);
-		background: rgba(255,0,0,0.06);
-		display:flex;align-items:center;justify-content:center;font-weight:700;
+		border: 3px solid rgba(0, 0, 0, 0.6);
+		background: rgba(255, 0, 0, 0.06);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
 	}
-	.trash.over { background: rgba(255,0,0,0.18); border-color: red; }
+
+	.trash.over {
+		background: rgba(255, 0, 0, 0.18);
+		border-color: red;
+	}
 </style>
 
 <div class="desktop-area">
-	
+
 	<div class="starting-area">
 		@if (folderVisible && folderLocation == "start")
 		{
 			<div id="folder" class="folder" draggable="true">Folder</div>
 		}
 	</div>
-	
 
-	<div class="hotspots" style="flex-wrap:wrap;">
-		<div id="hotspot-1" class="hotspot">@((folderVisible && folderLocation == "hotspot-1") ? (MarkupString)"<div id=\"folder\" class=\"folder\">Folder</div>" : (MarkupString)"Hotspot 1")</div>
-		<div id="hotspot-2" class="hotspot">@((folderVisible && folderLocation == "hotspot-2") ? (MarkupString)"<div id=\"folder\" class=\"folder\">Folder</div>" : (MarkupString)"Hotspot 2")</div>
-		<div id="hotspot-3" class="hotspot">@((folderVisible && folderLocation == "hotspot-3") ? (MarkupString)"<div id=\"folder\" class=\"folder\">Folder</div>" : (MarkupString)"Hotspot 3")</div>
-		<div id="hotspot-4" class="hotspot">@((folderVisible && folderLocation == "hotspot-4") ? (MarkupString)"<div id=\"folder\" class=\"folder\">Folder</div>" : (MarkupString)"Hotspot 4")</div>
-		<div id="hotspot-5" class="hotspot">@((folderVisible && folderLocation == "hotspot-5") ? (MarkupString)"<div id=\"folder\" class=\"folder\">Folder</div>" : (MarkupString)"Hotspot 5")</div>
+	
+	<div class="hotspots">
+		@for (int row = 0; row < HotspotRows; row++)
+		{
+			@for (int col = 0; col < HotspotCols; col++)
+			{
+				var hsId = $"hotspot-{row}-{col}";
+				<div @key="hsId" id="@hsId" class="hotspot">
+					@if (folderVisible && folderLocation == hsId)
+					{
+						<div id="folder" class="folder" draggable="true">Folder</div>
+					}
+				</div>
+			}
+		}
 	</div>
 
 
 	<div class="status">@statusMessage</div>
-	<div id="trash-container" class="trash">@((!folderVisible) ? "Trash full" : (folderLocation == "trash" ? "" : "Trash"))</div>
-</div>
+	<div id="trash-container" class="trash">@((!folderVisible) ? "Trash full" : (folderLocation == "trash" ? "" :
+				"Trash"))</div>
+	</div>
 
-<script>
-	(function () {
-	  window._folderDrag = window._folderDrag || {};
+	<script>
+		(function () {
+			window._folderDrag = window._folderDrag || {};
 
-	  window.registerFolderDrag = function (dotNetRef) {
-		// cleanup first
-		window.unregisterFolderDrag();
+			window.registerFolderDrag = function (dotNetRef) {
+				// cleanup first
+				window.unregisterFolderDrag();
 
-		// attach drag handlers; folder element may be re-rendered by Blazor, so re-query each registration
-		function attachFolderHandlers() {
-		  var folder = document.getElementById('folder');
-		  if (!folder) return null;
+				// attach drag handlers; folder element may be re-rendered by Blazor, so re-query each registration
+				function attachFolderHandlers() {
+					var folder = document.getElementById('folder');
+					if (!folder) return null;
 
-		  var onDragStart = function (e) {
-			if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'folder');
-			folder.classList.add('dragging');
-		  };
-		  var onDragEnd = function (e) { folder.classList.remove('dragging'); };
+					var onDragStart = function (e) {
+						if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'folder');
+						folder.classList.add('dragging');
+					};
+					var onDragEnd = function (e) { folder.classList.remove('dragging'); };
 
-		  // remove previous handlers if any
-		  try { folder.removeEventListener('dragstart', onDragStart); } catch (e) { }
-		  try { folder.removeEventListener('dragend', onDragEnd); } catch (e) { }
+					// remove previous handlers if any
+					try { folder.removeEventListener('dragstart', onDragStart); } catch (e) { }
+					try { folder.removeEventListener('dragend', onDragEnd); } catch (e) { }
 
-		  folder.addEventListener('dragstart', onDragStart);
-		  folder.addEventListener('dragend', onDragEnd);
+					folder.addEventListener('dragstart', onDragStart);
+					folder.addEventListener('dragend', onDragEnd);
 
-		  return { el: folder, onDragStart: onDragStart, onDragEnd: onDragEnd };
-		}
+					return { el: folder, onDragStart: onDragStart, onDragEnd: onDragEnd };
+				}
 
-		var folderHandlers = attachFolderHandlers();
+				var folderHandlers = attachFolderHandlers();
 
-		var hotspots = [];
-		for (var i = 1; i <= 5; i++) {
-		  var id = 'hotspot-' + i;
-		  var el = document.getElementById(id);
-		  if (!el) continue;
+				var hotspots = [];
+				document.querySelectorAll('.hotspot').forEach(function (el) {
+					var onDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
+					var onDragLeave = function (ev) { this.classList.remove('over'); };
+					var onDrop = function (ev) {
+						ev.preventDefault();
+						this.classList.remove('over');
+						try {
+							dotNetRef.invokeMethodAsync('OnFolderDropped', this.id).catch(function () { });
+						}
+						catch (e) { }
+					};
 
-		  var onDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
-		  var onDragLeave = function (ev) { this.classList.remove('over'); };
-			var onDrop = function (ev) {
-			ev.preventDefault();
-			this.classList.remove('over');
+					el.addEventListener('dragover', onDragOver);
+					el.addEventListener('dragleave', onDragLeave);
+					el.addEventListener('drop', onDrop);
 
-			try {
-			  // notify Blazor of the drop; Blazor will re-render the folder in the selected hotspot
-			  dotNetRef.invokeMethodAsync('OnFolderDropped', this.id).catch(function () { });
-			}
-			catch (e) { }
-		  };
+					(function (containerEl) {
+						setTimeout(function () {
+							var f = containerEl.querySelector('#folder');
+							if (f) {
+								try {
+									if (f.draggable !== true) f.setAttribute('draggable', 'true');
+								} catch (e) { }
+							}
+						}, 50);
+					})(el);
 
-		  el.addEventListener('dragover', onDragOver);
-		el.addEventListener('dragleave', onDragLeave);
-		el.addEventListener('drop', onDrop);
+					hotspots.push({ el: el, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop });
+				});
 
-		// If the folder is rendered inside this hotspot, attach handlers again to make it draggable
-		(function (containerEl) {
-		  // Delay to allow Blazor render to place folder markup
-		  setTimeout(function () {
-			var f = containerEl.querySelector('#folder');
-			if (f) {
-			  try {
-				if (f.draggable !== true) f.setAttribute('draggable', 'true');
-			  } catch (e) { }
-			}
-		  }, 50);
-		})(el);
+				// register trash container as a drop target (after hotspots)
+				var trash = document.getElementById('trash-container');
+				if (trash) {
+					var onTrashDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
+					var onTrashLeave = function (ev) { this.classList.remove('over'); };
+					var onTrashDrop = function (ev) {
+						ev.preventDefault();
+						this.classList.remove('over');
+						try {
+							// notify Blazor that the folder was dropped in the trash; Blazor will hide it
+							dotNetRef.invokeMethodAsync('OnFolderDeleted').catch(function () { });
+						} catch (e) { }
+					};
 
-		  hotspots.push({ el: el, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop });
-		}
+					trash.addEventListener('dragover', onTrashDragOver);
+					trash.addEventListener('dragleave', onTrashLeave);
+					trash.addEventListener('drop', onTrashDrop);
 
-	  // register trash container as a drop target (after hotspots)
-	  var trash = document.getElementById('trash-container');
-	  if (trash) {
-		var onTrashDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
-		var onTrashLeave = function (ev) { this.classList.remove('over'); };
-		var onTrashDrop = function (ev) {
-		  ev.preventDefault();
-		  this.classList.remove('over');
-		  try {
-			// notify Blazor that the folder was dropped in the trash; Blazor will hide it
-			dotNetRef.invokeMethodAsync('OnFolderDeleted').catch(function () { });
-		  } catch (e) { }
-		};
+					hotspots.push({ el: trash, onDragOver: onTrashDragOver, onDragLeave: onTrashLeave, onDrop: onTrashDrop });
+				}
 
-		trash.addEventListener('dragover', onTrashDragOver);
-		trash.addEventListener('dragleave', onTrashLeave);
-		trash.addEventListener('drop', onTrashDrop);
-
-		hotspots.push({ el: trash, onDragOver: onTrashDragOver, onDragLeave: onTrashLeave, onDrop: onTrashDrop });
-	  }
-
-		window._folderDrag = { /* folder: folder, */ folderHandlers: folderHandlers, hotspots: hotspots, dotNetRef: dotNetRef };
-	  };
+				window._folderDrag = { /* folder: folder, */ folderHandlers: folderHandlers, hotspots: hotspots, dotNetRef: dotNetRef };
+			};
 
 
-	  window.unregisterFolderDrag = function () {
-		var state = window._folderDrag;
-		if (!state) return;
-		try {
-		if (state.folderHandlers) {
-			try { if (state.folderHandlers.el) state.folderHandlers.el.removeEventListener('dragstart', state.folderHandlers.onDragStart); } catch (e) { }
-			try { if (state.folderHandlers.el) state.folderHandlers.el.removeEventListener('dragend', state.folderHandlers.onDragEnd); } catch (e) { }
-		  }
-		  if (state.hotspots) {
-			state.hotspots.forEach(function (h) {
-			  h.el.removeEventListener('dragover', h.onDragOver);
-			  h.el.removeEventListener('dragleave', h.onDragLeave);
-			  h.el.removeEventListener('drop', h.onDrop);
-			});
-		  }
-		} catch (e) { }
-		window._folderDrag = {};
-	  };
-	})();
-</script>
+			window.unregisterFolderDrag = function () {
+				var state = window._folderDrag;
+				if (!state) return;
+				try {
+					if (state.folderHandlers) {
+						try { if (state.folderHandlers.el) state.folderHandlers.el.removeEventListener('dragstart', state.folderHandlers.onDragStart); } catch (e) { }
+						try { if (state.folderHandlers.el) state.folderHandlers.el.removeEventListener('dragend', state.folderHandlers.onDragEnd); } catch (e) { }
+					}
+					if (state.hotspots) {
+						state.hotspots.forEach(function (h) {
+							h.el.removeEventListener('dragover', h.onDragOver);
+							h.el.removeEventListener('dragleave', h.onDragLeave);
+							h.el.removeEventListener('drop', h.onDrop);
+						});
+					}
+				} catch (e) { }
+				window._folderDrag = {};
+			};
+		})();
+	</script>
 
 @code {
+	private const int HotspotRows = 6;
+	private const int HotspotCols = 8;
+
 	private string statusMessage = "Drag the folder into a hotspot.";
 	private DotNetObjectReference<DraggableDesktop>? objRef;
 	private bool folderVisible = true;
-	private string folderLocation = "start"; // start | hotspot-1..5 | trash
+	private string folderLocation = "start"; // start | hotspot-{row}-{col} | trash
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
 			objRef = DotNetObjectReference.Create(this);
+		}
+		if (objRef != null)
+		{
 			await JS.InvokeVoidAsync("registerFolderDrag", objRef);
 		}
 	}
 
 	[JSInvokable]
-	public async Task OnFolderDropped(string hotspotId)
+	public Task OnFolderDropped(string hotspotId)
 	{
 		statusMessage = $"Folder dropped on: {hotspotId}";
-		// update component state so Blazor renders the folder inside the hotspot
 		folderVisible = true;
 		folderLocation = hotspotId;
 		StateHasChanged();
-
-		// Re-register JS handlers so the newly rendered folder element becomes draggable
-		try { await JS.InvokeVoidAsync("registerFolderDrag", objRef); } catch { }
+		// OnAfterRenderAsync will re-register JS handlers once the DOM is updated
+		return Task.CompletedTask;
 	}
 
 	[JSInvokable]
-	public async Task OnFolderDeleted()
+	public Task OnFolderDeleted()
 	{
 		statusMessage = "Folder moved to Trash and deleted.";
-		// update state to hide the folder
 		folderVisible = false;
 		folderLocation = "trash";
 		StateHasChanged();
-
-		// ensure JS handlers are updated (folder removed)
-		try { await JS.InvokeVoidAsync("registerFolderDrag", objRef); } catch { }
+		// OnAfterRenderAsync will re-register JS handlers once the DOM is updated
+		return Task.CompletedTask;
 	}
 
 	public void Dispose()
