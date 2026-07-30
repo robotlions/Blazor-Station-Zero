@@ -1,0 +1,12 @@
+
+
+/* Define the fade-in effect */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Class to apply to the text element */
+.animate-fade {
+  animation: fadeIn 1s ease-in-out;
+}

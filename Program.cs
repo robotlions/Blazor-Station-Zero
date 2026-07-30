@@ -8,7 +8,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 // (title service removed) 
 
-builder.Services.AddScoped<IProductService, ProductService>();
+
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<UserNameState>();
 

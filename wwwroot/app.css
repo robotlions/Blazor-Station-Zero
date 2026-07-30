@@ -63,11 +63,33 @@ h1:focus {
 
 
 .cat-background-image {
+    position: relative;
+    width: min(92vw, calc(82vh * (800 / 872)));
+    aspect-ratio: 800 / 872;
+    max-height: 82vh;
+    margin: 1rem auto;
     background-image:url(../assets/computerCat.jpg);
-    background-size: contain;
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
-    height:80vh;
+}
+
+.cat-background-content {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 60%;
+    transform: translateY(-50%);
+}
+
+.cat-input-label {
+    display: block;
+    margin-bottom: 0.4rem;
+}
+
+.cat-input {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .retro-background-image {

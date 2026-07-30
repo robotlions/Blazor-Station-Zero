@@ -6,10 +6,10 @@
 <SectionContent SectionName="page-title">Home</SectionContent>
 
 <div class="cat-background-image">
-</div>
+    <div class="cat-background-content">
 
-<div class="container-fluid pt-3">
-    <label for="userNameInput">User Name:</label>
-    <input id="userNameInput" class="form-control" type="text" @bind="UserNameState.UserName" @bind:event="oninput" />
+        <InputText id="userNameInput" class="form-control cat-input" type="text" @bind-value="UserNameState.UserName"
+                   placeholder="Enter your name" onkeydown="if(event.key === 'Enter'){ this.blur(); }" />
+    </div>
 </div>
 

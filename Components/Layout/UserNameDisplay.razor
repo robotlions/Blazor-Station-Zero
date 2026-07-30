@@ -2,7 +2,7 @@
 @inject Components.Services.UserNameState UserNameState
 @implements IDisposable
 
-<span class="fw-semibold">@UserNameState.UserName</span>
+<span class="animate-fade" @key=@UserNameState.UserName>@UserNameState.UserName</span>
 
 @code {
     protected override void OnInitialized()

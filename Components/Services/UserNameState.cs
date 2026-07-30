@@ -2,7 +2,7 @@ namespace Blazor_Station_Zero.Components.Services
 {
     public class UserNameState
     {
-        private string _userName = "Default name";
+        private string _userName = "";
 
         public string UserName
         {
