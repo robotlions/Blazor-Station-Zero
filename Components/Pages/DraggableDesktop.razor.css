@@ -1,31 +1,41 @@
 .desktop-menubar {
-	background: #c0c0c0;
-	border-top: 2px solid #fff;
-	border-bottom: 2px solid #808080;
+	background: #d8d8d8;
+	border-bottom: 1px solid #000000;
 	display: flex;
-	align-items: stretch;
-	height: 26px;
+	align-items: center;
+	height: 34px;
 	position: relative;
 	z-index: 50;
-	gap: 2px;
+	gap: 0;
 	padding: 0 4px;
+	font-family: 'VT323', monospace;
+	font-size: 22px;
+}
+
+.menu-apple {
+	padding: 0 12px;
+	font-size: 20px;
+	line-height: 1;
+	user-select: none;
+	cursor: default;
 }
 
 .menu-link {
 	display: flex;
 	align-items: center;
-	padding: 0 10px;
+	padding: 0 12px;
+	height: 100%;
 	color: #000;
 	text-decoration: none;
 	white-space: nowrap;
-	font-family: Arial, sans-serif;
-	font-size: 13px;
+	font-family: 'VT323', monospace;
+	font-size: 22px;
 	user-select: none;
 }
 
 	.menu-link:hover {
-		background: #000080;
-		color: #fff;
+		background: #000000;
+		color: #ffffff;
 	}
 
 .notepad-overlay {
@@ -53,9 +63,8 @@
 	background: #000080;
 	color: #fff;
 	padding: 3px 6px;
-	font-family: "Arial", sans-serif;
-	font-weight: bold;
-	font-size: 13px;
+	font-family: 'VT323', monospace;
+	font-size: 20px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
