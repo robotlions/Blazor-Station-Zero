@@ -6,6 +6,8 @@ export function registerFolderDrag(dotNetRef) {
 
 	var _folderDeletedByTrash = false;
 	var _textFileDeletedByTrash = false;
+	var _textFileDroppedInFolder = false;
+	var _isDraggingFolder = false;
 
 	function attachFolderHandlers() {
 		var folder = document.getElementById('folder');
@@ -18,12 +20,14 @@ export function registerFolderDrag(dotNetRef) {
 			if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'folder');
 			folder.classList.add('dragging');
 			_folderDeletedByTrash = false;
+			_isDraggingFolder = true;
 			var rect = folder.getBoundingClientRect();
 			folderOffsetX = e.clientX - rect.left;
 			folderOffsetY = e.clientY - rect.top;
 		};
 		var onDragEnd = function (e) {
 			folder.classList.remove('dragging');
+			_isDraggingFolder = false;
 			if (_folderDeletedByTrash) return;
 			var dr = desktopEl ? desktopEl.getBoundingClientRect() : null;
 			var inside = dr && e.clientX >= dr.left && e.clientX <= dr.right && e.clientY >= dr.top && e.clientY <= dr.bottom;
@@ -62,13 +66,14 @@ export function registerFolderDrag(dotNetRef) {
 			if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'text-file');
 			textFile.classList.add('dragging');
 			_textFileDeletedByTrash = false;
+			_textFileDroppedInFolder = false;
 			var rect = textFile.getBoundingClientRect();
 			offsetX = e.clientX - rect.left;
 			offsetY = e.clientY - rect.top;
 		};
 		var onDragEnd = function (e) {
 			textFile.classList.remove('dragging');
-			if (_textFileDeletedByTrash) return;
+			if (_textFileDeletedByTrash || _textFileDroppedInFolder) return;
 			var dr = desktopEl ? desktopEl.getBoundingClientRect() : null;
 			var inside = dr && e.clientX >= dr.left && e.clientX <= dr.right && e.clientY >= dr.top && e.clientY <= dr.bottom;
 			if (inside) {
@@ -93,6 +98,33 @@ export function registerFolderDrag(dotNetRef) {
 	}
 
 	var textFileHandlers = attachTextFileHandlers();
+
+	// register folder as drop target for text file only (not trash)
+	var folderDropEl = document.getElementById('folder');
+	var folderDropHandlers = null;
+	if (folderDropEl) {
+		var onFolderDragOver = function (ev) {
+			if (_isDraggingFolder || _isDraggingTrash) return;
+			ev.preventDefault();
+			if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+			folderDropEl.classList.add('over');
+		};
+		var onFolderDragLeave = function (ev) { folderDropEl.classList.remove('over'); };
+		var onFolderDrop = function (ev) {
+			if (_isDraggingFolder || _isDraggingTrash) return;
+			ev.preventDefault();
+			folderDropEl.classList.remove('over');
+			var dragType = ev.dataTransfer ? ev.dataTransfer.getData('text/plain') : '';
+			if (dragType === 'text-file') {
+				_textFileDroppedInFolder = true;
+				try { dotNetRef.invokeMethodAsync('OnTextFileDroppedInFolder').catch(function () { }); } catch (e) { }
+			}
+		};
+		folderDropEl.addEventListener('dragover', onFolderDragOver);
+		folderDropEl.addEventListener('dragleave', onFolderDragLeave);
+		folderDropEl.addEventListener('drop', onFolderDrop);
+		folderDropHandlers = { el: folderDropEl, onDragOver: onFolderDragOver, onDragLeave: onFolderDragLeave, onDrop: onFolderDrop };
+	}
 
 	// desktop-area is the single valid drop zone
 	var hotspots = [];
@@ -161,7 +193,7 @@ export function registerFolderDrag(dotNetRef) {
 		trashDragHandlers = { el: trash, onDragStart: onTrashDragStart, onDragEnd: onTrashDragEnd };
 	}
 
-	_folderDrag = { folderHandlers: folderHandlers, textFileHandlers: textFileHandlers, hotspots: hotspots, dotNetRef: dotNetRef, trashDragHandlers: trashDragHandlers };
+	_folderDrag = { folderHandlers: folderHandlers, textFileHandlers: textFileHandlers, folderDropHandlers: folderDropHandlers, hotspots: hotspots, dotNetRef: dotNetRef, trashDragHandlers: trashDragHandlers };
 }
 
 export function unregisterFolderDrag() {
@@ -186,6 +218,11 @@ export function unregisterFolderDrag() {
 		if (state.textFileHandlers) {
 			try { if (state.textFileHandlers.el) state.textFileHandlers.el.removeEventListener('dragstart', state.textFileHandlers.onDragStart); } catch (e) { }
 			try { if (state.textFileHandlers.el) state.textFileHandlers.el.removeEventListener('dragend', state.textFileHandlers.onDragEnd); } catch (e) { }
+		}
+		if (state.folderDropHandlers) {
+			try { state.folderDropHandlers.el.removeEventListener('dragover', state.folderDropHandlers.onDragOver); } catch (e) { }
+			try { state.folderDropHandlers.el.removeEventListener('dragleave', state.folderDropHandlers.onDragLeave); } catch (e) { }
+			try { state.folderDropHandlers.el.removeEventListener('drop', state.folderDropHandlers.onDrop); } catch (e) { }
 		}
 	} catch (e) { }
 	_folderDrag = {};

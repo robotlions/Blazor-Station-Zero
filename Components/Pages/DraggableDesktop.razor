@@ -14,20 +14,37 @@
 
 	@if (folderVisible)
 	{
-		<div id="folder" class="folder" draggable="true"
+		<div id="folder" class="folder" draggable="true" @onclick="ReleaseFromFolder"
 			 style="position:absolute; left:@((int)folderLeft)px; top:@((int)folderTop)px; z-index:10;">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-				<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-				<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111" stroke-width="2.5"
-					  stroke-linejoin="round" />
-				<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
-			</svg>
+			@if (textFileInFolder)
+			{
+				<!-- Folder containing a file: paper corner sticking up from inside -->
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
+					<rect x="52" y="1" width="34" height="28" rx="1" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5" />
+					<path d="M78 1 L86 1 L86 9 Z" fill="#ddd" stroke="#aaa" stroke-width="1" />
+					<line x1="57" y1="12" x2="82" y2="12" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
+					<line x1="57" y1="17" x2="82" y2="17" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
+					<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
+					<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111" stroke-width="2.5"
+						  stroke-linejoin="round" />
+					<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+				</svg>
+			}
+			else
+			{
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
+					<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
+					<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111" stroke-width="2.5"
+						  stroke-linejoin="round" />
+					<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+				</svg>
+			}
 		</div>
 	}
 
 	@if (textFileVisible)
 	{
-		<div id="text-file" class="text-file" draggable="true"
+		<div id="text-file" class="text-file" draggable="true" @ondblclick="OpenNotepad"
 			 style="position:absolute; left:@((int)textFileLeft)px; top:@((int)textFileTop)px; z-index:10;">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 68" width="56" height="68">
 				<path d="M4 2 L40 2 L54 16 L54 66 L4 66 Z" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5"
@@ -42,9 +59,10 @@
 	}
 
 	@* <div class="status">@statusMessage</div> *@
-	<div id="trash-container" class="trash @((!folderVisible || !textFileVisible) ? "clickable" : "")"
+	<div id="trash-container"
+		 class="trash @((!folderVisible || (!textFileVisible && !textFileInFolder)) ? "clickable" : "")"
 		 @onclick="ResetAll">
-		@if (!folderVisible)
+		@if (!folderVisible || (!textFileVisible && !textFileInFolder))
 		{
 			<!-- Full trash: lid ajar, folder tab peeking out -->
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
@@ -77,15 +95,33 @@
 	</div>
 </div>
 
+@if (notepadOpen)
+{
+	<div class="notepad-overlay" @onclick="CloseNotepad">
+		<div class="notepad-window" @onclick:stopPropagation="true">
+			<div class="notepad-titlebar">
+				<span>NOTEPAD</span>
+				<button class="notepad-close" @onclick="CloseNotepad">✕</button>
+			</div>
+			<textarea @ref="_notepadRef" class="notepad-content" @bind="notepadContent" @bind:event="oninput"></textarea>
+		</div>
+	</div>
+}
+
 @code {
 	private DotNetObjectReference<DraggableDesktop>? objRef;
 	private IJSObjectReference? _jsModule;
+	private ElementReference _notepadRef;
+	private bool notepadOpen = false;
+	private bool _focusNotepad = false;
+	private string notepadContent = "";
 	private bool folderVisible = true;
 	private double folderLeft = 12.0;
 	private double folderTop = 12.0;
 	private bool textFileVisible = true;
 	private double textFileLeft = 100.0;
 	private double textFileTop = 12.0;
+	private bool textFileInFolder = false;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -98,7 +134,20 @@
 		{
 			await _jsModule.InvokeVoidAsync("registerFolderDrag", objRef);
 		}
+		if (_focusNotepad)
+		{
+			_focusNotepad = false;
+			try { await _notepadRef.FocusAsync(); } catch { }
+		}
 	}
+
+	private void OpenNotepad()
+	{
+		notepadOpen = true;
+		_focusNotepad = true;
+	}
+
+	private void CloseNotepad() => notepadOpen = false;
 
 	[JSInvokable]
 	public Task OnFolderMoved(double left, double top)
@@ -134,11 +183,29 @@
 		return Task.CompletedTask;
 	}
 
+	[JSInvokable]
+	public Task OnTextFileDroppedInFolder()
+	{
+		textFileVisible = false;
+		textFileInFolder = true;
+		StateHasChanged();
+		return Task.CompletedTask;
+	}
+
+	private void ReleaseFromFolder()
+	{
+		if (!textFileInFolder) return;
+		textFileInFolder = false;
+		textFileVisible = true;
+		textFileLeft = folderLeft + 76;
+		textFileTop = folderTop;
+	}
+
 	private void ResetAll()
 	{
-		if (folderVisible && textFileVisible) return;
+		if (folderVisible && (textFileVisible || textFileInFolder)) return;
 		if (!folderVisible) { folderVisible = true; folderLeft = 12.0; folderTop = 12.0; }
-		if (!textFileVisible) { textFileVisible = true; textFileLeft = 100.0; textFileTop = 12.0; }
+		if (!textFileVisible && !textFileInFolder) { textFileVisible = true; textFileLeft = 100.0; textFileTop = 12.0; }
 	}
 
 	public async ValueTask DisposeAsync()
