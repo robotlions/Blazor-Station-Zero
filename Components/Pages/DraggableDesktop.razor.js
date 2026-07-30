@@ -1,5 +1,6 @@
 var _isDraggingTrash = false;
 var _folderDrag = {};
+var _desktopWindowDrag = { bindings: [] };
 
 export function registerFolderDrag(dotNetRef) {
 	unregisterFolderDrag();
@@ -226,4 +227,81 @@ export function unregisterFolderDrag() {
 		}
 	} catch (e) { }
 	_folderDrag = {};
+}
+
+export function registerDesktopWindowDrag() {
+	unregisterDesktopWindowDrag();
+
+	var desktopEl = document.getElementById('desktop-area');
+	if (!desktopEl) return;
+
+	function bindWindow(windowId, handleId) {
+		var win = document.getElementById(windowId);
+		var handle = document.getElementById(handleId);
+		if (!win || !handle) return;
+
+		var dragging = false;
+		var offsetX = 0;
+		var offsetY = 0;
+
+		var onMouseDown = function (e) {
+			if (e.button !== 0) return;
+			if (e.target && e.target.closest('button, a, textarea, input, select, option, label')) return;
+			var dr = desktopEl.getBoundingClientRect();
+			var rect = win.getBoundingClientRect();
+			if (win.style.transform !== 'none') {
+				win.style.left = (rect.left - dr.left) + 'px';
+				win.style.top = (rect.top - dr.top) + 'px';
+				win.style.transform = 'none';
+			}
+			dragging = true;
+			rect = win.getBoundingClientRect();
+			offsetX = e.clientX - rect.left;
+			offsetY = e.clientY - rect.top;
+			e.preventDefault();
+		};
+
+		var onMouseMove = function (e) {
+			if (!dragging) return;
+			var dr = desktopEl.getBoundingClientRect();
+			var newLeft = e.clientX - dr.left - offsetX;
+			var newTop = e.clientY - dr.top - offsetY;
+			newLeft = Math.max(0, Math.min(newLeft, dr.width - win.offsetWidth));
+			newTop = Math.max(0, Math.min(newTop, dr.height - win.offsetHeight));
+			win.style.left = newLeft + 'px';
+			win.style.top = newTop + 'px';
+		};
+
+		var onMouseUp = function () { dragging = false; };
+
+		handle.addEventListener('mousedown', onMouseDown);
+		document.addEventListener('mousemove', onMouseMove);
+		document.addEventListener('mouseup', onMouseUp);
+
+		_desktopWindowDrag.bindings.push({
+			windowEl: win,
+			handleEl: handle,
+			onMouseDown: onMouseDown,
+			onMouseMove: onMouseMove,
+			onMouseUp: onMouseUp
+		});
+	}
+
+	bindWindow('launcher-window', 'launcher-titlebar');
+	bindWindow('notepad-window', 'notepad-titlebar');
+}
+
+export function unregisterDesktopWindowDrag() {
+	if (!_desktopWindowDrag || !_desktopWindowDrag.bindings) {
+		_desktopWindowDrag = { bindings: [] };
+		return;
+	}
+
+	_desktopWindowDrag.bindings.forEach(function (b) {
+		try { if (b.handleEl) b.handleEl.removeEventListener('mousedown', b.onMouseDown); } catch (e) { }
+		try { document.removeEventListener('mousemove', b.onMouseMove); } catch (e) { }
+		try { document.removeEventListener('mouseup', b.onMouseUp); } catch (e) { }
+	});
+
+	_desktopWindowDrag = { bindings: [] };
 }

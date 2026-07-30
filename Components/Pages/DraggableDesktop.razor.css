@@ -80,16 +80,14 @@
 }
 
 .notepad-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.45);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 200;
+	display: none;
 }
 
 .notepad-window {
+	position: absolute;
+	top: 26%;
+	left: 34%;
+	transform: translateX(-50%);
 	width: 520px;
 	height: 380px;
 	background: #d8d8d8;
@@ -98,6 +96,7 @@
 	display: flex;
 	flex-direction: column;
 	font-family: 'VT323', monospace;
+	z-index: 40;
 }
 
 .notepad-titlebar {
@@ -220,10 +219,10 @@
 .launcher-window {
 	position: absolute;
 	top: 16%;
-	left: 50%;
+	left: 40%;
 	transform: translateX(-50%);
-	width: 420px;
-	height: 340px;
+	width: 520px;
+	height: 380px;
 	background: #d8d8d8;
 	border: 2px solid #000000;
 	box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55);
@@ -231,6 +230,18 @@
 	font-family: 'VT323', monospace;
 	display: flex;
 	flex-direction: column;
+}
+
+.draggable-window {
+	user-select: none;
+}
+
+.draggable-window-handle {
+	cursor: move;
+}
+
+.window-hidden {
+	display: none !important;
 }
 
 .launcher-titlebar {
@@ -285,14 +296,14 @@
 	color: #000;
 	border: 1px solid transparent;
 	padding: 10px;
-	min-height: 104px;
+	min-height: 126px;
 }
 
 .launcher-link:hover,
 .launcher-link:focus-visible {
-	background: #000;
-	color: #fff;
-	border-color: #000;
+	background: transparent;
+	color: #000;
+	border-color: transparent;
 	outline: none;
 }
 
@@ -300,15 +311,15 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 52px;
-	height: 52px;
+	width: 72px;
+	height: 72px;
 	line-height: 1;
 	margin-bottom: 6px;
 }
 
 .launcher-icon svg {
-	width: 46px;
-	height: 46px;
+	width: 64px;
+	height: 64px;
 	display: block;
 }
 
@@ -319,5 +330,5 @@
 
 .launcher-link:hover .launcher-icon svg,
 .launcher-link:focus-visible .launcher-icon svg {
-	filter: grayscale(0.05) contrast(1.08);
+	filter: none;
 }

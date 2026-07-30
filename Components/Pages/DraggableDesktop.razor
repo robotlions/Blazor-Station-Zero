@@ -132,80 +132,72 @@
 			}
 		</div>
 
-		@if (launcherOpen)
-		{
-			<div class="launcher-window">
-				<div class="launcher-titlebar">
-					<span>APPLICATIONS</span>
-					<button class="launcher-close" @onclick="CloseLauncher">✕</button>
-				</div>
-				<div class="launcher-content">
-					<a href="/textinput" class="launcher-link">
-						<span class="launcher-icon" aria-hidden="true">
-							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-								<rect x="3" y="3" width="26" height="26" rx="2" fill="#e7ebf2" stroke="#6b737f" stroke-width="1.5" />
-								<rect x="6" y="6" width="20" height="4" fill="#c3c8d0" />
-								<line x1="8" y1="15" x2="24" y2="15" stroke="#9aa3b1" stroke-width="1.5" />
-								<line x1="8" y1="19" x2="24" y2="19" stroke="#9aa3b1" stroke-width="1.5" />
-								<line x1="8" y1="23" x2="19" y2="23" stroke="#9aa3b1" stroke-width="1.5" />
-							</svg>
-						</span>
-						<span class="launcher-label">TextInput</span>
-					</a>
-					<a href="/message-generator" class="launcher-link">
-						<span class="launcher-icon" aria-hidden="true">
-							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-								<rect x="3" y="4" width="26" height="19" rx="2" fill="#e7ebf2" stroke="#6b737f" stroke-width="1.5" />
-								<path d="M10 23 L10 28 L15 23 Z" fill="#e7ebf2" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
-								<line x1="8" y1="10" x2="24" y2="10" stroke="#9aa3b1" stroke-width="1.5" />
-								<line x1="8" y1="14" x2="22" y2="14" stroke="#9aa3b1" stroke-width="1.5" />
-								<line x1="8" y1="18" x2="18" y2="18" stroke="#9aa3b1" stroke-width="1.5" />
-							</svg>
-						</span>
-						<span class="launcher-label">MessageGenerator</span>
-					</a>
-					<a href="/weather" class="launcher-link">
-						<span class="launcher-icon" aria-hidden="true">
-							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-								<circle cx="10" cy="12" r="3.5" fill="#f2c546" stroke="#9a8b4f" stroke-width="1.2" />
-								<path d="M11 22 H24 C26.8 22 29 20.2 29 18 C29 15.8 27.2 14 24.8 14 C24.2 11.2 21.8 9 18.8 9 C15.8 9 13.4 11 12.8 13.7 C10 13.8 8 15.7 8 18 C8 20.2 9.9 22 11 22 Z" fill="#e6ebf2" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
-							</svg>
-						</span>
-						<span class="launcher-label">Weather</span>
-					</a>
-					<a href="/counter" class="launcher-link">
-						<span class="launcher-icon" aria-hidden="true">
-							<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-								<rect x="5" y="3" width="22" height="26" rx="2" fill="#dfe4ec" stroke="#6b737f" stroke-width="1.5" />
-								<rect x="8" y="6" width="16" height="6" fill="#f7f9fc" stroke="#9aa3b1" stroke-width="1" />
-								<rect x="8" y="15" width="4" height="4" fill="#bfc6d1" />
-								<rect x="14" y="15" width="4" height="4" fill="#bfc6d1" />
-								<rect x="20" y="15" width="4" height="4" fill="#bfc6d1" />
-								<rect x="8" y="21" width="4" height="4" fill="#bfc6d1" />
-								<rect x="14" y="21" width="4" height="4" fill="#bfc6d1" />
-								<rect x="20" y="21" width="4" height="4" fill="#f2c546" stroke="#9a8b4f" stroke-width="0.8" />
-							</svg>
-						</span>
-						<span class="launcher-label">Counter</span>
-					</a>
-				</div>
+		<div id="launcher-window" class="launcher-window draggable-window @(launcherOpen ? string.Empty : "window-hidden")">
+			<div id="launcher-titlebar" class="launcher-titlebar draggable-window-handle">
+				<span>APPLICATIONS</span>
+				<button class="launcher-close" @onclick="CloseLauncher">✕</button>
 			</div>
-		}
-	</div>
-</div>
+			<div class="launcher-content">
+				<a href="/textinput" class="launcher-link">
+					<span class="launcher-icon" aria-hidden="true">
+						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+							<rect x="3" y="3" width="26" height="26" rx="2" fill="#f6f8fb" stroke="#6b737f" stroke-width="1.5" />
+							<rect x="6" y="6" width="20" height="4" fill="#8aa2d8" />
+							<line x1="8" y1="15" x2="24" y2="15" stroke="#5f7dc0" stroke-width="1.5" />
+							<line x1="8" y1="19" x2="24" y2="19" stroke="#5f7dc0" stroke-width="1.5" />
+							<line x1="8" y1="23" x2="19" y2="23" stroke="#5f7dc0" stroke-width="1.5" />
+						</svg>
+					</span>
+					<span class="launcher-label">TextInput</span>
+				</a>
+				<a href="/message-generator" class="launcher-link">
+					<span class="launcher-icon" aria-hidden="true">
+						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+							<rect x="3" y="4" width="26" height="19" rx="2" fill="#f7f0fd" stroke="#6b737f" stroke-width="1.5" />
+							<path d="M10 23 L10 28 L15 23 Z" fill="#f7f0fd" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
+							<line x1="8" y1="10" x2="24" y2="10" stroke="#a06ac8" stroke-width="1.5" />
+							<line x1="8" y1="14" x2="22" y2="14" stroke="#a06ac8" stroke-width="1.5" />
+							<line x1="8" y1="18" x2="18" y2="18" stroke="#a06ac8" stroke-width="1.5" />
+						</svg>
+					</span>
+					<span class="launcher-label">MessageGenerator</span>
+				</a>
+				<a href="/weather" class="launcher-link">
+					<span class="launcher-icon" aria-hidden="true">
+						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="10" cy="12" r="3.5" fill="#ffd84f" stroke="#b1892b" stroke-width="1.2" />
+							<path d="M11 22 H24 C26.8 22 29 20.2 29 18 C29 15.8 27.2 14 24.8 14 C24.2 11.2 21.8 9 18.8 9 C15.8 9 13.4 11 12.8 13.7 C10 13.8 8 15.7 8 18 C8 20.2 9.9 22 11 22 Z" fill="#eaf3ff" stroke="#6b737f" stroke-width="1.5" stroke-linejoin="round" />
+						</svg>
+					</span>
+					<span class="launcher-label">Weather</span>
+				</a>
+				<a href="/counter" class="launcher-link">
+					<span class="launcher-icon" aria-hidden="true">
+						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+							<rect x="5" y="3" width="22" height="26" rx="2" fill="#e8edf6" stroke="#6b737f" stroke-width="1.5" />
+							<rect x="8" y="6" width="16" height="6" fill="#f7f9fc" stroke="#9aa3b1" stroke-width="1" />
+							<rect x="8" y="15" width="4" height="4" fill="#7aa8db" />
+							<rect x="14" y="15" width="4" height="4" fill="#7aa8db" />
+							<rect x="20" y="15" width="4" height="4" fill="#7aa8db" />
+							<rect x="8" y="21" width="4" height="4" fill="#7aa8db" />
+							<rect x="14" y="21" width="4" height="4" fill="#7aa8db" />
+							<rect x="20" y="21" width="4" height="4" fill="#e75d53" stroke="#9c3a33" stroke-width="0.8" />
+						</svg>
+					</span>
+					<span class="launcher-label">Counter</span>
+				</a>
+			</div>
+		</div>
 
-@if (notepadOpen)
-{
-	<div class="notepad-overlay" @onclick="CloseNotepad">
-		<div class="notepad-window" @onclick:stopPropagation="true">
-			<div class="notepad-titlebar">
+		<div id="notepad-window" class="notepad-window draggable-window @(notepadOpen ? string.Empty : "window-hidden")">
+			<div id="notepad-titlebar" class="notepad-titlebar draggable-window-handle">
 				<span>NOTEPAD</span>
 				<button class="notepad-close" @onclick="CloseNotepad">✕</button>
 			</div>
 			<textarea @ref="_notepadRef" class="notepad-content" @bind="notepadContent" @bind:event="oninput"></textarea>
 		</div>
 	</div>
-}
+</div>
 
 @code {
 	private DotNetObjectReference<DraggableDesktop>? objRef;
@@ -233,6 +225,7 @@
 		if (_jsModule != null && objRef != null)
 		{
 			await _jsModule.InvokeVoidAsync("registerFolderDrag", objRef);
+			await _jsModule.InvokeVoidAsync("registerDesktopWindowDrag");
 		}
 		if (_focusNotepad)
 		{
@@ -315,6 +308,7 @@
 	public async ValueTask DisposeAsync()
 	{
 		try { if (_jsModule != null) await _jsModule.InvokeVoidAsync("unregisterFolderDrag"); } catch { }
+		try { if (_jsModule != null) await _jsModule.InvokeVoidAsync("unregisterDesktopWindowDrag"); } catch { }
 		if (_jsModule != null) await _jsModule.DisposeAsync();
 		objRef?.Dispose();
 	}
