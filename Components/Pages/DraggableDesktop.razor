@@ -10,7 +10,7 @@
 <PageTitle>Draggable Desktop</PageTitle>
 <SectionContent SectionName="page-title">Draggable Desktop</SectionContent>
 
-<div class="desktop-area">
+<div id="desktop-area" class="desktop-area">
 
 	@if (folderVisible)
 	{
@@ -24,18 +24,6 @@
 			</svg>
 		</div>
 	}
-
-	<div class="hotspots">
-		@for (int row = 0; row < HotspotRows; row++)
-		{
-			@for (int col = 0; col < HotspotCols; col++)
-			{
-				var hsId = $"hotspot-{row}-{col}";
-				<div @key="hsId" id="@hsId" class="hotspot"></div>
-			}
-		}
-	</div>
-
 
 	@* <div class="status">@statusMessage</div> *@
 	<div id="trash-container" class="trash @(!folderVisible ? "clickable" : "")" @onclick="ResetFolder">
@@ -101,13 +89,19 @@
 				};
 				var onDragEnd = function (e) {
 					folder.classList.remove('dragging');
-					if (!_folderDeletedByTrash && desktopEl && e.clientX !== 0 && e.clientY !== 0) {
-						var dr = desktopEl.getBoundingClientRect();
+					if (_folderDeletedByTrash) return;
+					var dr = desktopEl ? desktopEl.getBoundingClientRect() : null;
+					var inside = dr && e.clientX >= dr.left && e.clientX <= dr.right && e.clientY >= dr.top && e.clientY <= dr.bottom;
+					if (inside) {
 						var newLeft = Math.max(0, Math.min(e.clientX - dr.left - folderOffsetX, dr.width - folder.offsetWidth));
 						var newTop = Math.max(0, Math.min(e.clientY - dr.top - folderOffsetY, dr.height - folder.offsetHeight));
 						folder.style.left = newLeft + 'px';
 						folder.style.top = newTop + 'px';
 						try { dotNetRef.invokeMethodAsync('OnFolderMoved', newLeft, newTop).catch(function () { }); } catch (e2) { }
+					} else {
+						folder.style.left = '12px';
+						folder.style.top = '12px';
+						try { dotNetRef.invokeMethodAsync('OnFolderMoved', 12, 12).catch(function () { }); } catch (e2) { }
 					}
 				};
 
@@ -123,21 +117,17 @@
 
 			var folderHandlers = attachFolderHandlers();
 
+			// desktop-area is the single valid drop zone
 			var hotspots = [];
-			document.querySelectorAll('.hotspot').forEach(function (el) {
-				var onDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; this.classList.add('over'); };
-				var onDragLeave = function (ev) { this.classList.remove('over'); };
-				var onDrop = function (ev) {
-					ev.preventDefault();
-					this.classList.remove('over');
-				};
-
-				el.addEventListener('dragover', onDragOver);
-				el.addEventListener('dragleave', onDragLeave);
-				el.addEventListener('drop', onDrop);
-
-				hotspots.push({ el: el, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop });
-			});
+			var desktopDropEl = document.getElementById('desktop-area');
+			if (desktopDropEl) {
+				var onDesktopDragOver = function (ev) { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move'; };
+				var onDesktopDragLeave = function () {};
+				var onDesktopDrop = function (ev) { ev.preventDefault(); };
+				desktopDropEl.addEventListener('dragover', onDesktopDragOver);
+				desktopDropEl.addEventListener('drop', onDesktopDrop);
+				hotspots.push({ el: desktopDropEl, onDragOver: onDesktopDragOver, onDragLeave: onDesktopDragLeave, onDrop: onDesktopDrop });
+			}
 
 			// register trash container as a drop target and drag source
 			var trash = document.getElementById('trash-container');
@@ -220,9 +210,6 @@
 </script>
 
 @code {
-	private const int HotspotRows = 6;
-	private const int HotspotCols = 12;
-
 	private DotNetObjectReference<DraggableDesktop>? objRef;
 	private bool folderVisible = true;
 	private double folderLeft = 12.0;
