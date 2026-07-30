@@ -5,6 +5,7 @@ export function registerFolderDrag(dotNetRef) {
 	unregisterFolderDrag();
 
 	var _folderDeletedByTrash = false;
+	var _textFileDeletedByTrash = false;
 
 	function attachFolderHandlers() {
 		var folder = document.getElementById('folder');
@@ -50,6 +51,49 @@ export function registerFolderDrag(dotNetRef) {
 
 	var folderHandlers = attachFolderHandlers();
 
+	function attachTextFileHandlers() {
+		var textFile = document.getElementById('text-file');
+		if (!textFile) return null;
+
+		var offsetX = 0, offsetY = 0;
+		var desktopEl = document.querySelector('.desktop-area');
+
+		var onDragStart = function (e) {
+			if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'text-file');
+			textFile.classList.add('dragging');
+			_textFileDeletedByTrash = false;
+			var rect = textFile.getBoundingClientRect();
+			offsetX = e.clientX - rect.left;
+			offsetY = e.clientY - rect.top;
+		};
+		var onDragEnd = function (e) {
+			textFile.classList.remove('dragging');
+			if (_textFileDeletedByTrash) return;
+			var dr = desktopEl ? desktopEl.getBoundingClientRect() : null;
+			var inside = dr && e.clientX >= dr.left && e.clientX <= dr.right && e.clientY >= dr.top && e.clientY <= dr.bottom;
+			if (inside) {
+				var newLeft = Math.max(0, Math.min(e.clientX - dr.left - offsetX, dr.width - textFile.offsetWidth));
+				var newTop = Math.max(0, Math.min(e.clientY - dr.top - offsetY, dr.height - textFile.offsetHeight));
+				textFile.style.left = newLeft + 'px';
+				textFile.style.top = newTop + 'px';
+				try { dotNetRef.invokeMethodAsync('OnTextFileMoved', newLeft, newTop).catch(function () { }); } catch (e2) { }
+			} else {
+				textFile.style.left = '100px';
+				textFile.style.top = '12px';
+				try { dotNetRef.invokeMethodAsync('OnTextFileMoved', 100, 12).catch(function () { }); } catch (e2) { }
+			}
+		};
+
+		try { textFile.removeEventListener('dragstart', onDragStart); } catch (e) { }
+		try { textFile.removeEventListener('dragend', onDragEnd); } catch (e) { }
+		textFile.addEventListener('dragstart', onDragStart);
+		textFile.addEventListener('dragend', onDragEnd);
+
+		return { el: textFile, onDragStart: onDragStart, onDragEnd: onDragEnd };
+	}
+
+	var textFileHandlers = attachTextFileHandlers();
+
 	// desktop-area is the single valid drop zone
 	var hotspots = [];
 	var desktopDropEl = document.getElementById('desktop-area');
@@ -72,10 +116,14 @@ export function registerFolderDrag(dotNetRef) {
 			if (_isDraggingTrash) return;
 			ev.preventDefault();
 			this.classList.remove('over');
-			_folderDeletedByTrash = true;
-			try {
-				dotNetRef.invokeMethodAsync('OnFolderDeleted').catch(function () { });
-			} catch (e) { }
+			var dragType = ev.dataTransfer ? ev.dataTransfer.getData('text/plain') : '';
+			if (dragType === 'folder') {
+				_folderDeletedByTrash = true;
+				try { dotNetRef.invokeMethodAsync('OnFolderDeleted').catch(function () { }); } catch (e) { }
+			} else if (dragType === 'text-file') {
+				_textFileDeletedByTrash = true;
+				try { dotNetRef.invokeMethodAsync('OnTextFileDeleted').catch(function () { }); } catch (e) { }
+			}
 		};
 
 		trash.addEventListener('dragover', onTrashDragOver);
@@ -113,7 +161,7 @@ export function registerFolderDrag(dotNetRef) {
 		trashDragHandlers = { el: trash, onDragStart: onTrashDragStart, onDragEnd: onTrashDragEnd };
 	}
 
-	_folderDrag = { folderHandlers: folderHandlers, hotspots: hotspots, dotNetRef: dotNetRef, trashDragHandlers: trashDragHandlers };
+	_folderDrag = { folderHandlers: folderHandlers, textFileHandlers: textFileHandlers, hotspots: hotspots, dotNetRef: dotNetRef, trashDragHandlers: trashDragHandlers };
 }
 
 export function unregisterFolderDrag() {
@@ -134,6 +182,10 @@ export function unregisterFolderDrag() {
 		if (state.trashDragHandlers) {
 			try { state.trashDragHandlers.el.removeEventListener('dragstart', state.trashDragHandlers.onDragStart); } catch (e) { }
 			try { state.trashDragHandlers.el.removeEventListener('dragend', state.trashDragHandlers.onDragEnd); } catch (e) { }
+		}
+		if (state.textFileHandlers) {
+			try { if (state.textFileHandlers.el) state.textFileHandlers.el.removeEventListener('dragstart', state.textFileHandlers.onDragStart); } catch (e) { }
+			try { if (state.textFileHandlers.el) state.textFileHandlers.el.removeEventListener('dragend', state.textFileHandlers.onDragEnd); } catch (e) { }
 		}
 	} catch (e) { }
 	_folderDrag = {};

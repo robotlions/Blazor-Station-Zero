@@ -6,6 +6,18 @@
 	overflow: hidden;
 }
 
+.text-file {
+	width: 56px;
+	height: 68px;
+	user-select: none;
+	cursor: grab;
+	filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.15));
+}
+
+.text-file.dragging {
+	opacity: 0.6;
+}
+
 .folder {
 	width: 68px;
 	height: 57px;

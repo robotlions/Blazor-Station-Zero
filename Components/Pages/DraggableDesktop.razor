@@ -25,8 +25,25 @@
 		</div>
 	}
 
+	@if (textFileVisible)
+	{
+		<div id="text-file" class="text-file" draggable="true"
+			 style="position:absolute; left:@((int)textFileLeft)px; top:@((int)textFileTop)px; z-index:10;">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 68" width="56" height="68">
+				<path d="M4 2 L40 2 L54 16 L54 66 L4 66 Z" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5"
+					  stroke-linejoin="round" />
+				<path d="M40 2 L40 16 L54 16 Z" fill="#ddd" stroke="#aaa" stroke-width="1.5" stroke-linejoin="round" />
+				<line x1="11" y1="26" x2="46" y2="26" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+				<line x1="11" y1="34" x2="46" y2="34" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+				<line x1="11" y1="42" x2="46" y2="42" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+				<line x1="11" y1="50" x2="34" y2="50" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+			</svg>
+		</div>
+	}
+
 	@* <div class="status">@statusMessage</div> *@
-	<div id="trash-container" class="trash @(!folderVisible ? "clickable" : "")" @onclick="ResetFolder">
+	<div id="trash-container" class="trash @((!folderVisible || !textFileVisible) ? "clickable" : "")"
+		 @onclick="ResetAll">
 		@if (!folderVisible)
 		{
 			<!-- Full trash: lid ajar, folder tab peeking out -->
@@ -66,6 +83,9 @@
 	private bool folderVisible = true;
 	private double folderLeft = 12.0;
 	private double folderTop = 12.0;
+	private bool textFileVisible = true;
+	private double textFileLeft = 100.0;
+	private double textFileTop = 12.0;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -97,12 +117,28 @@
 		return Task.CompletedTask;
 	}
 
-	private void ResetFolder()
+	[JSInvokable]
+	public Task OnTextFileMoved(double left, double top)
 	{
-		if (folderVisible) return;
-		folderVisible = true;
-		folderLeft = 12.0;
-		folderTop = 12.0;
+		textFileLeft = left;
+		textFileTop = top;
+		StateHasChanged();
+		return Task.CompletedTask;
+	}
+
+	[JSInvokable]
+	public Task OnTextFileDeleted()
+	{
+		textFileVisible = false;
+		StateHasChanged();
+		return Task.CompletedTask;
+	}
+
+	private void ResetAll()
+	{
+		if (folderVisible && textFileVisible) return;
+		if (!folderVisible) { folderVisible = true; folderLeft = 12.0; folderTop = 12.0; }
+		if (!textFileVisible) { textFileVisible = true; textFileLeft = 100.0; textFileTop = 12.0; }
 	}
 
 	public async ValueTask DisposeAsync()
