@@ -6,118 +6,125 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 	<style>
-		.top-row { display: none !important; }
-		article.container-fluid { padding-top: 50px !important; }
+			.top-row {
+				display: none !important;
+			}
+
+			article.container-fluid {
+				padding-top: 50px !important;
+			}
 	</style>
 </HeadContent>
 
 <PageTitle>Draggable Desktop</PageTitle>
 <SectionContent SectionName="page-title">Draggable Desktop</SectionContent>
 
-<div class="desktop-menubar">
-	<span class="menu-apple">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 26" width="18" height="20">
-			<!-- Monitor bezel -->
-			<rect x="0" y="0" width="24" height="18" rx="2" fill="#111" />
-			<!-- Screen (white cutout) -->
-			<rect x="2" y="2" width="20" height="13" fill="#fff" />
-			<!-- Stand stem -->
-			<rect x="9" y="18" width="6" height="4" fill="#111" />
-			<!-- Base -->
-			<rect x="3" y="22" width="18" height="3" rx="1" fill="#111" />
-		</svg>
-	</span>
-	<a href="/" class="menu-link">Home</a>
-	<a href="/textinput" class="menu-link">Text Input</a>
-	<a href="/message-generator" class="menu-link">Message Generator</a>
-	<a href="/draggable-desktop" class="menu-link">Draggable Desktop</a>
-	<a href="/iteration" class="menu-link">Iteration</a>
-	<a href="/weather" class="menu-link">Weather</a>
-	<a href="/counter" class="menu-link">Counter</a>
+<div class="row">
+	<div class="desktop-menubar">
+		<span class="menu-apple">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 26" width="18" height="20">
+				<!-- Monitor bezel -->
+				<rect x="0" y="0" width="24" height="18" rx="2" fill="#111" />
+				<!-- Screen (white cutout) -->
+				<rect x="2" y="2" width="20" height="13" fill="#fff" />
+				<!-- Stand stem -->
+				<rect x="9" y="18" width="6" height="4" fill="#111" />
+				<!-- Base -->
+				<rect x="3" y="22" width="18" height="3" rx="1" fill="#111" />
+			</svg>
+		</span>
+		<a href="/" class="menu-link">Home</a>
+		<a href="/textinput" class="menu-link">Text Input</a>
+		<a href="/message-generator" class="menu-link">Message Generator</a>
+		<a href="/iteration" class="menu-link">Iteration</a>
+		<a href="/weather" class="menu-link">Weather</a>
+		<a href="/counter" class="menu-link">Counter</a>
+	</div>
 </div>
+<div class="row">
+	<div id="desktop-area" class="desktop-area col-12">
 
-<div id="desktop-area" class="desktop-area">
+		@if (folderVisible)
+		{
+			<div id="folder" class="folder" draggable="true" @onclick="ReleaseFromFolder"
+				 style="position:absolute; left:@((int)folderLeft)px; top:@((int)folderTop)px; z-index:10;">
+				@if (textFileInFolder)
+				{
+					<!-- Folder containing a file: paper corner sticking up from inside -->
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
+						<rect x="52" y="1" width="34" height="28" rx="1" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5" />
+						<path d="M78 1 L86 1 L86 9 Z" fill="#ddd" stroke="#aaa" stroke-width="1" />
+						<line x1="57" y1="12" x2="82" y2="12" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
+						<line x1="57" y1="17" x2="82" y2="17" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
+						<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
+						<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111"
+							  stroke-width="2.5" stroke-linejoin="round" />
+						<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+					</svg>
+				}
+				else
+				{
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
+						<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
+						<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111"
+							  stroke-width="2.5" stroke-linejoin="round" />
+						<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+					</svg>
+				}
+			</div>
+		}
 
-	@if (folderVisible)
-	{
-		<div id="folder" class="folder" draggable="true" @onclick="ReleaseFromFolder"
-			 style="position:absolute; left:@((int)folderLeft)px; top:@((int)folderTop)px; z-index:10;">
-			@if (textFileInFolder)
-			{
-				<!-- Folder containing a file: paper corner sticking up from inside -->
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-					<rect x="52" y="1" width="34" height="28" rx="1" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5" />
-					<path d="M78 1 L86 1 L86 9 Z" fill="#ddd" stroke="#aaa" stroke-width="1" />
-					<line x1="57" y1="12" x2="82" y2="12" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
-					<line x1="57" y1="17" x2="82" y2="17" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" />
-					<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-					<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111" stroke-width="2.5"
+		@if (textFileVisible)
+		{
+			<div id="text-file" class="text-file" draggable="true" @ondblclick="OpenNotepad"
+				 style="position:absolute; left:@((int)textFileLeft)px; top:@((int)textFileTop)px; z-index:10;">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 68" width="56" height="68">
+					<path d="M4 2 L40 2 L54 16 L54 66 L4 66 Z" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5"
 						  stroke-linejoin="round" />
-					<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+					<path d="M40 2 L40 16 L54 16 Z" fill="#ddd" stroke="#aaa" stroke-width="1.5" stroke-linejoin="round" />
+					<line x1="11" y1="26" x2="46" y2="26" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+					<line x1="11" y1="34" x2="46" y2="34" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+					<line x1="11" y1="42" x2="46" y2="42" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+					<line x1="11" y1="50" x2="34" y2="50" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
+				</svg>
+			</div>
+		}
+
+		@* <div class="status">@statusMessage</div> *@
+		<div id="trash-container"
+			 class="trash @((!folderVisible || (!textFileVisible && !textFileInFolder)) ? "clickable" : "")"
+			 @onclick="ResetAll">
+			@if (!folderVisible || (!textFileVisible && !textFileInFolder))
+			{
+				<!-- Full trash: lid ajar, folder tab peeking out -->
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
+					<path d="M28 22 L28 17 Q28 14 31 14 L46 14 Q51 14 53 17 L56 22 Z" fill="#ffd86b" stroke="#111"
+						  stroke-width="1.5" stroke-linejoin="round" />
+					<path d="M10 28 L15 82 L65 82 L70 28 Z" fill="#cc3333" stroke="#222" stroke-width="2.5"
+						  stroke-linejoin="round" />
+					<rect x="4" y="19" width="68" height="9" rx="3" fill="#bb2222" stroke="#222" stroke-width="2"
+						  transform="rotate(-6 38 23)" />
+					<rect x="24" y="7" width="28" height="9" rx="4" fill="#992222" stroke="#222" stroke-width="2"
+						  transform="rotate(-6 38 11)" />
+					<line x1="30" y1="35" x2="28" y2="75" stroke="#aa2222" stroke-width="2" />
+					<line x1="40" y1="35" x2="40" y2="75" stroke="#aa2222" stroke-width="2" />
+					<line x1="50" y1="35" x2="52" y2="75" stroke="#aa2222" stroke-width="2" />
 				</svg>
 			}
 			else
 			{
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-					<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-					<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111" stroke-width="2.5"
+				<!-- Empty trash -->
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
+					<rect x="24" y="4" width="28" height="9" rx="4" fill="#aaa" stroke="#222" stroke-width="2" />
+					<rect x="4" y="11" width="68" height="9" rx="3" fill="#ccc" stroke="#222" stroke-width="2" />
+					<path d="M10 20 L15 82 L65 82 L70 20 Z" fill="#ddd" stroke="#222" stroke-width="2.5"
 						  stroke-linejoin="round" />
-					<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+					<line x1="30" y1="27" x2="28" y2="75" stroke="#aaa" stroke-width="2" />
+					<line x1="40" y1="27" x2="40" y2="75" stroke="#aaa" stroke-width="2" />
+					<line x1="50" y1="27" x2="52" y2="75" stroke="#aaa" stroke-width="2" />
 				</svg>
 			}
 		</div>
-	}
-
-	@if (textFileVisible)
-	{
-		<div id="text-file" class="text-file" draggable="true" @ondblclick="OpenNotepad"
-			 style="position:absolute; left:@((int)textFileLeft)px; top:@((int)textFileTop)px; z-index:10;">
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 68" width="56" height="68">
-				<path d="M4 2 L40 2 L54 16 L54 66 L4 66 Z" fill="#f8f8f8" stroke="#aaa" stroke-width="1.5"
-					  stroke-linejoin="round" />
-				<path d="M40 2 L40 16 L54 16 Z" fill="#ddd" stroke="#aaa" stroke-width="1.5" stroke-linejoin="round" />
-				<line x1="11" y1="26" x2="46" y2="26" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-				<line x1="11" y1="34" x2="46" y2="34" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-				<line x1="11" y1="42" x2="46" y2="42" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-				<line x1="11" y1="50" x2="34" y2="50" stroke="#ccc" stroke-width="2" stroke-linecap="round" />
-			</svg>
-		</div>
-	}
-
-	@* <div class="status">@statusMessage</div> *@
-	<div id="trash-container"
-		 class="trash @((!folderVisible || (!textFileVisible && !textFileInFolder)) ? "clickable" : "")"
-		 @onclick="ResetAll">
-		@if (!folderVisible || (!textFileVisible && !textFileInFolder))
-		{
-			<!-- Full trash: lid ajar, folder tab peeking out -->
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
-				<path d="M28 22 L28 17 Q28 14 31 14 L46 14 Q51 14 53 17 L56 22 Z" fill="#ffd86b" stroke="#111"
-					  stroke-width="1.5" stroke-linejoin="round" />
-				<path d="M10 28 L15 82 L65 82 L70 28 Z" fill="#cc3333" stroke="#222" stroke-width="2.5"
-					  stroke-linejoin="round" />
-				<rect x="4" y="19" width="68" height="9" rx="3" fill="#bb2222" stroke="#222" stroke-width="2"
-					  transform="rotate(-6 38 23)" />
-				<rect x="24" y="7" width="28" height="9" rx="4" fill="#992222" stroke="#222" stroke-width="2"
-					  transform="rotate(-6 38 11)" />
-				<line x1="30" y1="35" x2="28" y2="75" stroke="#aa2222" stroke-width="2" />
-				<line x1="40" y1="35" x2="40" y2="75" stroke="#aa2222" stroke-width="2" />
-				<line x1="50" y1="35" x2="52" y2="75" stroke="#aa2222" stroke-width="2" />
-			</svg>
-		}
-		else
-		{
-			<!-- Empty trash -->
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 88" width="56" height="62">
-				<rect x="24" y="4" width="28" height="9" rx="4" fill="#aaa" stroke="#222" stroke-width="2" />
-				<rect x="4" y="11" width="68" height="9" rx="3" fill="#ccc" stroke="#222" stroke-width="2" />
-				<path d="M10 20 L15 82 L65 82 L70 20 Z" fill="#ddd" stroke="#222" stroke-width="2.5"
-					  stroke-linejoin="round" />
-				<line x1="30" y1="27" x2="28" y2="75" stroke="#aaa" stroke-width="2" />
-				<line x1="40" y1="27" x2="40" y2="75" stroke="#aaa" stroke-width="2" />
-				<line x1="50" y1="27" x2="52" y2="75" stroke="#aaa" stroke-width="2" />
-			</svg>
-		}
 	</div>
 </div>
 
