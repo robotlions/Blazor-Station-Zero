@@ -119,8 +119,8 @@
 	private double folderLeft = 12.0;
 	private double folderTop = 12.0;
 	private bool textFileVisible = true;
-	private double textFileLeft = 100.0;
-	private double textFileTop = 12.0;
+	private double textFileLeft = 12.0;
+	private double textFileTop = 85.0;
 	private bool textFileInFolder = false;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -197,15 +197,15 @@
 		if (!textFileInFolder) return;
 		textFileInFolder = false;
 		textFileVisible = true;
-		textFileLeft = folderLeft + 76;
-		textFileTop = folderTop;
+		textFileLeft = folderLeft;
+		textFileTop = folderTop + 85;
 	}
 
 	private void ResetAll()
 	{
 		if (folderVisible && (textFileVisible || textFileInFolder)) return;
 		if (!folderVisible) { folderVisible = true; folderLeft = 12.0; folderTop = 12.0; }
-		if (!textFileVisible && !textFileInFolder) { textFileVisible = true; textFileLeft = 100.0; textFileTop = 12.0; }
+		if (!textFileVisible && !textFileInFolder) { textFileVisible = true; textFileLeft = 12.0; textFileTop = 85.0; }
 	}
 
 	public async ValueTask DisposeAsync()

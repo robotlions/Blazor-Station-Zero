@@ -83,8 +83,8 @@ export function registerFolderDrag(dotNetRef) {
 				textFile.style.top = newTop + 'px';
 				try { dotNetRef.invokeMethodAsync('OnTextFileMoved', newLeft, newTop).catch(function () { }); } catch (e2) { }
 			} else {
-				textFile.style.left = '100px';
-				textFile.style.top = '12px';
+				textFile.style.left = '12px';
+				textFile.style.top = '85px';
 				try { dotNetRef.invokeMethodAsync('OnTextFileMoved', 100, 12).catch(function () { }); } catch (e2) { }
 			}
 		};
