@@ -10,124 +10,28 @@
 <PageTitle>Draggable Desktop</PageTitle>
 <SectionContent SectionName="page-title">Draggable Desktop</SectionContent>
 
-<style>
-	.desktop-area {
-		min-height: 320px;
-		background: linear-gradient(180deg, #7fb7ff, #cfeaff);
-		position: relative;
-		height: 70vh;
-		overflow: hidden;
-	}
-
-	.folder {
-		width: 68px;
-		height: 57px;
-		user-select: none;
-		cursor: grab;
-		filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.3));
-	}
-
-	.folder.dragging {
-		opacity: 0.6;
-	}
-
-	.trash.dragging {
-		opacity: 0.6;
-	}
-
-	.hotspots {
-		position: absolute;
-		inset: 0;
-		display: grid;
-		grid-template-columns: repeat(12, 1fr);
-		grid-template-rows: repeat(6, 1fr);
-	}
-
-	.hotspot {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.hotspot.over {
-		background: rgba(0, 128, 0, 0.12);
-		border-color: green;
-	}
-
-	.starting-area {
-		position: absolute;
-		top: 12px;
-		left: 12px;
-		z-index: 10;
-	}
-
-	.status {
-		position: absolute;
-		bottom: 130px;
-		left: 12px;
-		z-index: 10;
-		font-family: "Courier New", monospace;
-		background: rgba(255, 255, 255, 0.7);
-		padding: 4px 8px;
-	}
-
-	.trash.clickable {
-		cursor: pointer;
-	}
-
-	/* Trash container */
-	.trash {
-		position: absolute;
-		right: 24px;
-		bottom: 24px;
-		width: 56px;
-		height: 62px;
-		cursor: default;
-		filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.3));
-		transition: filter 0.15s;
-	}
-
-	.trash.over {
-		filter: drop-shadow(0 0 10px rgba(220, 0, 0, 0.75));
-	}
-</style>
-
 <div class="desktop-area">
 
-	<div class="starting-area">
-		@if (folderVisible && folderLocation == "start")
-		{
-			<div id="folder" class="folder" draggable="true">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-					<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-					<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111"
-						  stroke-width="2.5" stroke-linejoin="round" />
-					<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
-				</svg>
-			</div>
-		}
-	</div>
+	@if (folderVisible)
+	{
+		<div id="folder" class="folder" draggable="true"
+			 style="position:absolute; left:@((int)folderLeft)px; top:@((int)folderTop)px; z-index:10;">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
+				<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
+				<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111" stroke-width="2.5"
+					  stroke-linejoin="round" />
+				<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
+			</svg>
+		</div>
+	}
 
-	
 	<div class="hotspots">
 		@for (int row = 0; row < HotspotRows; row++)
 		{
 			@for (int col = 0; col < HotspotCols; col++)
 			{
 				var hsId = $"hotspot-{row}-{col}";
-				<div @key="hsId" id="@hsId" class="hotspot">
-					@if (folderVisible && folderLocation == hsId)
-					{
-						<div id="folder" class="folder" draggable="true">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 80" width="68" height="57">
-								<rect x="1" y="22" width="94" height="57" rx="5" fill="#f0b02b" stroke="#111" stroke-width="2.5" />
-								<path d="M1 22 L1 13 Q1 9 5 9 L36 9 Q43 9 46 13 L50 22 Z" fill="#ffd86b" stroke="#111"
-									  stroke-width="2.5" stroke-linejoin="round" />
-								<rect x="5" y="26" width="86" height="10" rx="2" fill="#fff" opacity="0.18" />
-							</svg>
-						</div>
-					}
-				</div>
+				<div @key="hsId" id="@hsId" class="hotspot"></div>
 			}
 		}
 	</div>
@@ -177,16 +81,35 @@
 			// cleanup first
 			window.unregisterFolderDrag();
 
+			var _folderDeletedByTrash = false;
+
 			// attach drag handlers; folder element may be re-rendered by Blazor, so re-query each registration
 			function attachFolderHandlers() {
 				var folder = document.getElementById('folder');
 				if (!folder) return null;
 
+				var folderOffsetX = 0, folderOffsetY = 0;
+				var desktopEl = document.querySelector('.desktop-area');
+
 				var onDragStart = function (e) {
 					if (e.dataTransfer) e.dataTransfer.setData('text/plain', 'folder');
 					folder.classList.add('dragging');
+					_folderDeletedByTrash = false;
+					var rect = folder.getBoundingClientRect();
+					folderOffsetX = e.clientX - rect.left;
+					folderOffsetY = e.clientY - rect.top;
 				};
-				var onDragEnd = function (e) { folder.classList.remove('dragging'); };
+				var onDragEnd = function (e) {
+					folder.classList.remove('dragging');
+					if (!_folderDeletedByTrash && desktopEl && e.clientX !== 0 && e.clientY !== 0) {
+						var dr = desktopEl.getBoundingClientRect();
+						var newLeft = Math.max(0, Math.min(e.clientX - dr.left - folderOffsetX, dr.width - folder.offsetWidth));
+						var newTop = Math.max(0, Math.min(e.clientY - dr.top - folderOffsetY, dr.height - folder.offsetHeight));
+						folder.style.left = newLeft + 'px';
+						folder.style.top = newTop + 'px';
+						try { dotNetRef.invokeMethodAsync('OnFolderMoved', newLeft, newTop).catch(function () { }); } catch (e2) { }
+					}
+				};
 
 				// remove previous handlers if any
 				try { folder.removeEventListener('dragstart', onDragStart); } catch (e) { }
@@ -207,27 +130,11 @@
 				var onDrop = function (ev) {
 					ev.preventDefault();
 					this.classList.remove('over');
-					if (_isDraggingTrash) return;
-					try {
-						dotNetRef.invokeMethodAsync('OnFolderDropped', this.id).catch(function () { });
-					}
-					catch (e) { }
 				};
 
 				el.addEventListener('dragover', onDragOver);
 				el.addEventListener('dragleave', onDragLeave);
 				el.addEventListener('drop', onDrop);
-
-				(function (containerEl) {
-					setTimeout(function () {
-						var f = containerEl.querySelector('#folder');
-						if (f) {
-							try {
-								if (f.draggable !== true) f.setAttribute('draggable', 'true');
-							} catch (e) { }
-						}
-					}, 50);
-				})(el);
 
 				hotspots.push({ el: el, onDragOver: onDragOver, onDragLeave: onDragLeave, onDrop: onDrop });
 			});
@@ -242,6 +149,7 @@
 					if (_isDraggingTrash) return;
 					ev.preventDefault();
 					this.classList.remove('over');
+					_folderDeletedByTrash = true;
 					try {
 						dotNetRef.invokeMethodAsync('OnFolderDeleted').catch(function () { });
 					} catch (e) { }
@@ -315,10 +223,10 @@
 	private const int HotspotRows = 6;
 	private const int HotspotCols = 12;
 
-	private string statusMessage = "Drag the folder into a hotspot.";
 	private DotNetObjectReference<DraggableDesktop>? objRef;
 	private bool folderVisible = true;
-	private string folderLocation = "start"; // start | hotspot-{row}-{col} | trash
+	private double folderLeft = 12.0;
+	private double folderTop = 12.0;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -333,33 +241,28 @@
 	}
 
 	[JSInvokable]
-	public Task OnFolderDropped(string hotspotId)
+	public Task OnFolderMoved(double left, double top)
 	{
-		statusMessage = $"Folder dropped on: {hotspotId}";
-		folderVisible = true;
-		folderLocation = hotspotId;
+		folderLeft = left;
+		folderTop = top;
 		StateHasChanged();
-		// OnAfterRenderAsync will re-register JS handlers once the DOM is updated
 		return Task.CompletedTask;
 	}
 
 	[JSInvokable]
 	public Task OnFolderDeleted()
 	{
-		statusMessage = "Folder moved to Trash and deleted.";
 		folderVisible = false;
-		folderLocation = "trash";
 		StateHasChanged();
-		// OnAfterRenderAsync will re-register JS handlers once the DOM is updated
 		return Task.CompletedTask;
 	}
 
 	private void ResetFolder()
 	{
 		if (folderVisible) return;
-		statusMessage = "Folder restored to starting position.";
 		folderVisible = true;
-		folderLocation = "start";
+		folderLeft = 12.0;
+		folderTop = 12.0;
 	}
 
 	public void Dispose()
